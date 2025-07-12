@@ -1,11 +1,17 @@
-const name: string = 'Dư Thanh Được lỏ cak heheheh'
-const age: number = 20
-const isStudent: boolean = true
-const hobbies: string[] = ['coding', 'reading', 'traveling']
+import express from 'express'
+import usersRouter from './routes/users.routers'
+import databaseService from './services/database.services'
+const app = express()
+const port = 3000
 
-const person: { name: string; age: number } = { name: 'John', age: 30 }
+app.get('/', (req, res) => {
+  res.send('cmm')
+})
 
-console.log(name)
-console.log(age)
-console.log(isStudent)
-console.log(hobbies)
+app.use(express.json())
+databaseService.connect()
+
+app.use('/users', usersRouter)
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`)
+})
