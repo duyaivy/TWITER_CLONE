@@ -1,5 +1,7 @@
 import { Request, Response } from 'express'
 import userService from '~/services/user.services'
+import { ParamsDictionary } from 'express-serve-static-core'
+import { RegisterRequest } from '~/models/requests/User.request'
 
 const loginController = (req: Request, res: Response) => {
   const { email, password } = req.body
@@ -13,11 +15,10 @@ const loginController = (req: Request, res: Response) => {
     }
   ])
 }
-const registerController = async (req: Request, res: Response) => {
-  const { email, password } = req.body
+const registerController = async (req: Request<ParamsDictionary, any, RegisterRequest>, res: Response) => {
   try {
-    const result = await userService.register({ email, password })
-    return res.json({
+    const result = await userService.register(req.body)
+    return res.status(201).json({
       message: 'register success',
       data: result
     })
