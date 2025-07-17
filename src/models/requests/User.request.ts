@@ -6,14 +6,13 @@ export interface RegisterRequest {
   date_of_birth: string
 }
 
-export interface RegisterResponse {
-  message: string
-  data: {
-    _id: string
-    name: string
-    email: string
-    date_of_birth: string
-    created_at: Date
-    updated_at: Date
-  }
+export interface LoginRequest {
+  email: string
+  password: string
+}
+export interface LogoutOrRefreshTokenRequest {
+  refresh_token: string
+}
+export interface EmailVerifyRequest {
+  email_verify_token: string
 }

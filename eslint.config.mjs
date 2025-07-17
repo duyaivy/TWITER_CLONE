@@ -1,5 +1,4 @@
 import globals from 'globals'
-import pluginJs from '@eslint/js'
 import tseslint from '@typescript-eslint/eslint-plugin'
 import parser from '@typescript-eslint/parser'
 import eslintPluginPrettier from 'eslint-plugin-prettier'
@@ -20,7 +19,7 @@ export default [
       prettier: eslintPluginPrettier
     },
     rules: {
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': 'warn',
       'prettier/prettier': [
         'warn',

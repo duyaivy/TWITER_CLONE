@@ -1,0 +1,42 @@
+export enum USER_MESSAGES {
+  VALIDATION_ERROR = 'Validation error',
+  EMAIL_ALREADY_EXISTS = 'Email already exists',
+  NAME_REQUIRED = 'Name is required',
+  EMAIL_REQUIRED = 'Email is required',
+  PASSWORD_REQUIRED = 'Password is required',
+  CONFIRM_PASSWORD_REQUIRED = 'Confirm password is required',
+  DATE_OF_BIRTH_REQUIRED = 'Date of birth is required',
+  NAME_MUST_BE_BETWEEN_3_AND_50_CHARACTERS = 'Name must be between 3 and 50 characters',
+  INVALID_EMAIL = 'Invalid email',
+  PASSWORD_MUST_BE_BETWEEN_8_AND_50_CHARACTERS = 'Password must be between 8 and 50 characters',
+  PASSWORD_MUST_CONTAIN_UPPERCASE_NUMBER_AND_SPECIAL_CHARACTER = 'Password must contain at least 8 characters, 1 uppercase letter, 1 number and 1 special character',
+  PASSWORD_CONFIRMATION_DOES_NOT_MATCH = 'Password confirmation does not match password',
+  DATE_OF_BIRTH_MUST_BE_IN_THE_PAST = 'Date of birth must be in the past',
+  DATE_OF_BIRTH_MUST_BE_AFTER_1910 = 'Date of birth must be after 1910',
+  INVALID_DATE_OF_BIRTH = 'Invalid date of birth',
+  REGISTER_SUCCESS = 'Register success',
+  LOGIN_SUCCESS = 'Login success',
+  USER_NOT_VERIFIED_OR_BANNED = 'User not verified or banned',
+  EMAIL_OR_PASSWORD_INCORRECT = 'Email or password is incorrect',
+  LOGOUT_SUCCESS = 'Logout success'
+}
+
+export enum POST_MESSAGES {
+  VALIDATION_ERROR = 'Validation error',
+  POST_NOT_FOUND = 'Post not found',
+  UNAUTHORIZED = 'Unauthorized',
+  FORBIDDEN = 'Forbidden',
+  INTERNAL_SERVER_ERROR = 'Internal server error',
+  SERVICE_UNAVAILABLE = 'Service unavailable',
+  ACCESS_TOKEN_REQUIRED = 'Access token is required',
+  REFRESH_TOKEN_REQUIRED = 'Refresh token is required',
+  REFRESH_TOKEN_SUCCESS = 'Refresh token success',
+  INVALID_REFRESH_TOKEN = 'Invalid refresh token',
+  EMAIL_VERIFY_TOKEN_REQUIRED = 'Email verify token is required',
+  EMAIL_VERIFY_SUCCESS = 'Email verify success',
+  USER_NOT_VERIFIED_OR_BANNED = 'User not verified or banned',
+  INVALID_EMAIL_VERIFY_TOKEN = 'Invalid email verify token',
+  EMAIL_ALREADY_VERIFIED = 'Email already verified',
+  USER_NOT_FOUND = 'User not found',
+  EMAIL_RESEND_VERIFY_SUCCESS = 'Resend email verify success'
+}

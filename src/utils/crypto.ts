@@ -7,7 +7,3 @@ export function sha256(content: string) {
 export function hashPassword(password: string) {
   return sha256(password + process.env.PRIVATE_PASSWORD)
 }
-
-export function verifyPassword(password: string, hash: string) {
-  return hashPassword(password + process.env.PRIVATE_PASSWORD) === hash
-}
