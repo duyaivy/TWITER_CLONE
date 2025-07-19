@@ -321,7 +321,30 @@ class UserService {
       },
       { returnDocument: 'after', projection: { password: 0, email_verify_token: 0, forgot_password_token: 0 } }
     )
-
+    return result
+  }
+  async changePassword(userId: string, password: string) {
+    const hashedPassword = hashPassword(password)
+    const result = await databaseService.users.findOneAndUpdate(
+      { _id: new ObjectId(userId) },
+      {
+        $set: {
+          password: hashedPassword,
+          updated_at: new Date()
+        }
+      },
+      {
+        returnDocument: 'after',
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0
+        }
+      }
+    )
+    if (!result) {
+      throw new ErrorWithStatus(POST_MESSAGES.INTERNAL_SERVER_ERROR, HTTP_STATUS.INTERNAL_SERVER_ERROR)
+    }
     return result
   }
   async followUser(followed_user_id: string, user_id: string) {

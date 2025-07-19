@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import {
+  changePWController,
   emailResendController,
   emailVerifyController,
   followUserController,
@@ -17,6 +18,7 @@ import {
 import { filterMiddlewares } from '~/middlewares/common.middleware'
 import {
   accessTokenValidator,
+  changePWValidator,
   emailResendValidator,
   emailTokenValidator,
   followUserValidator,
@@ -29,7 +31,7 @@ import {
   updateMeValidator,
   userVerifyValidator
 } from '~/middlewares/users.middlewares'
-import { UpdateMeRequest } from '~/models/requests/User.request'
+import { ChangePWRequest, UpdateMeRequest } from '~/models/requests/User.request'
 import { wrapRequestHandler } from '~/utils/handler'
 
 const usersRouter = Router()
@@ -103,7 +105,7 @@ usersRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeController)
  * Method: PATCH
  * Authorization: Bearer <token>
  * Description: Update current user information
- * Payload: { name, email, date_of_birth, bio, location, website, username, avatar, cover_photo, password }
+ * Payload: { name, email, date_of_birth, bio, location, website, username, avatar, cover_photo }
  */
 usersRouter.patch(
   '/me',
@@ -117,13 +119,25 @@ usersRouter.patch(
     'website',
     'username',
     'avatar',
-    'cover_photo',
-    'password'
+    'cover_photo'
   ]),
   updateMeValidator,
   wrapRequestHandler(updateMeController)
 )
-
+/* path:users/change-password
+ * Method: PUT
+ * Authorization: Bearer <token>
+ * Description: Update current user information
+ * Payload: { old_password, password, confirm_password }
+ */
+usersRouter.put(
+  '/change-password',
+  accessTokenValidator,
+  userVerifyValidator,
+  filterMiddlewares<ChangePWRequest>(['old_password', 'confirm_password', 'password']),
+  changePWValidator,
+  wrapRequestHandler(changePWController)
+)
 /* path:users/get-profile/:username
  * Method: GET
  * Description: Get user information by username

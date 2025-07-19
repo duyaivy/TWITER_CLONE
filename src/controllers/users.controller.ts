@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import userService from '~/services/user.services'
 import { ParamsDictionary } from 'express-serve-static-core'
 import {
+  ChangePWRequest,
   EmailVerifyRequest,
   FollowUserRequest,
   LoginRequest,
@@ -116,7 +117,7 @@ export const getMeController = async (req: Request<ParamsDictionary, any, {}>, r
   const userId = req.decode_access_token?.userId
   const userData = await userService.getMe(userId as string)
   return res.json({
-    message: POST_MESSAGES.GET_ME_SUCCESS,
+    message: USER_MESSAGES.GET_ME_SUCCESS,
     data: userData
   })
 }
@@ -125,14 +126,23 @@ export const updateMeController = async (req: Request<ParamsDictionary, any, Upd
   const userUpdate: UpdateMeRequest = req.body
   const result = await userService.updateMe(userId as string, userUpdate)
   return res.json({
-    message: POST_MESSAGES.UPDATE_ME_SUCCESS,
+    message: USER_MESSAGES.UPDATE_ME_SUCCESS,
+    data: result
+  })
+}
+export const changePWController = async (req: Request<ParamsDictionary, any, ChangePWRequest>, res: Response) => {
+  const userId = req.decode_access_token?.userId
+  const { password } = req.body
+  const result = await userService.changePassword(userId as string, password)
+  return res.json({
+    message: USER_MESSAGES.CHANGE_PASSWORD_SUCCESS,
     data: result
   })
 }
 export const getProfileController = (req: Request<ParamsDictionary, any, {}>, res: Response) => {
   const user = req.user as User
   return res.json({
-    message: POST_MESSAGES.GET_ME_SUCCESS,
+    message: USER_MESSAGES.GET_ME_SUCCESS,
     data: user
   })
 }

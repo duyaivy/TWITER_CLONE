@@ -22,7 +22,13 @@ export enum USER_MESSAGES {
   INVALID_VALUE = 'Value invalid',
   VALUE_MUST_BE_LESS_THAN_160 = 'Value must be less than 160 characters',
   VALUE_MUST_BE_BETWEEN_3_AND_50_CHARACTERS = 'Value must be between 3 and 50 characters',
-  USERNAME_REQUIRED = 'Username is required'
+  USERNAME_REQUIRED = 'Username is required',
+  CHANGE_PASSWORD_SUCCESS = 'Change password success',
+  GET_ME_SUCCESS = 'Get user information success',
+  UPDATE_ME_SUCCESS = 'Update user information success',
+  INCORRECT_PASSWORD = 'Incorrect password',
+  INVALID_USERNAME = 'Username must start with a letter and can only contain letters, numbers, and underscores, and must be between 4 and 50 characters',
+  USERNAME_ALREADY_EXISTS = 'Username already exists'
 }
 
 export enum POST_MESSAGES {
@@ -46,8 +52,6 @@ export enum POST_MESSAGES {
   EMAIL_CANT_SEND = "Email can't send something wrong",
   SEND_FORGOT_PASSWORD_SUCCESS = 'Send email forgot password success',
   RESET_PASSWORD_INVALID = 'Reset password invalid',
-  GET_ME_SUCCESS = 'Get user information success',
-  UPDATE_ME_SUCCESS = 'Update user information success',
   FOLLOWED_USER_ID_REQUIRED = 'Followed user ID is required',
   FOLLOW_USER_SUCCESS = 'Follow user success',
   UNFOLLOW_USER_SUCCESS = 'Unfollow user success',

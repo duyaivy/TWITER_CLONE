@@ -32,6 +32,11 @@ export interface UpdateMeRequest {
   cover_photo?: string
   password?: string
 }
+export interface ChangePWRequest {
+  password: string
+  old_password: string
+  confirm_password: string
+}
 export interface FollowUserRequest {
   followed_user_id: string
 }

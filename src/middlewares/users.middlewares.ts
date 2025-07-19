@@ -12,6 +12,7 @@ import ENV from '~/constants/config'
 import { ObjectId } from 'mongodb'
 import { TokenPayload } from '~/type'
 import { NextFunction, Request, Response } from 'express'
+import { REGEX_USERNAME } from '~/utils/regex'
 
 const dateOfBirthSchema: ParamSchema = {
   notEmpty: {
@@ -367,12 +368,17 @@ export const updateMeValidator = validate(
           errorMessage: USER_MESSAGES.INVALID_VALUE
         },
         trim: true,
-        isLength: {
-          options: {
-            min: 3,
-            max: 50
-          },
-          errorMessage: USER_MESSAGES.VALUE_MUST_BE_BETWEEN_3_AND_50_CHARACTERS
+        custom: {
+          options: async (value) => {
+            if (!REGEX_USERNAME.test(value)) {
+              throw new Error(USER_MESSAGES.INVALID_USERNAME)
+            }
+            const user = await databaseService.users.findOne({ username: value })
+            if (user) {
+              throw new Error(USER_MESSAGES.USERNAME_ALREADY_EXISTS)
+            }
+            return true
+          }
         }
       },
       avatar: linkSchema,
@@ -382,6 +388,28 @@ export const updateMeValidator = validate(
         optional: true,
         notEmpty: undefined
       }
+    },
+    ['body']
+  )
+)
+export const changePWValidator = validate(
+  checkSchema(
+    {
+      old_password: {
+        ...passwordSchema,
+        custom: {
+          options: async (value, { req }) => {
+            const userId = req.decode_access_token?.userId
+            const user = await databaseService.users.findOne({ _id: new ObjectId(userId) })
+            if (user?.password !== hashPassword(value)) {
+              throw new Error(USER_MESSAGES.INCORRECT_PASSWORD)
+            }
+            return true
+          }
+        }
+      },
+      password: passwordSchema,
+      confirm_password: confirmPasswordSchema
     },
     ['body']
   )
