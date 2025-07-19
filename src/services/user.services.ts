@@ -3,14 +3,16 @@ import databaseService from './database.services'
 import { hashPassword } from '~/utils/crypto'
 import { signToken } from '~/utils/jwt'
 import { TokenType, UserVerifyStatus } from '~/constants/enum'
-import { RegisterRequest } from '~/models/requests/User.request'
+import { RegisterRequest, UpdateMeRequest } from '~/models/requests/User.request'
 import { StringValue } from 'ms'
 import { ObjectId } from 'mongodb'
 import { omit } from 'lodash'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import { POST_MESSAGES } from '~/constants/messages'
 import { TokenPayload } from '~/type'
-import { sendRegisterEmailNodemailer } from '~/utils/email'
+import { sendForgotPasswordNodemailer, sendRegisterEmailNodemailer } from '~/utils/email'
+import ENV from '~/constants/config'
+import e from 'express'
 
 class UserService {
   private signAccessToken({
@@ -29,7 +31,8 @@ class UserService {
       options: {
         expiresIn: process.env.EXPIRES_TIME_ACCESS_TOKEN as StringValue,
         algorithm: 'HS256'
-      }
+      },
+      privateKey: ENV.ACCESS_TOKEN_PRIVATE_KEY
     })
   }
   /**
@@ -57,7 +60,8 @@ class UserService {
         },
         options: {
           algorithm: 'HS256'
-        }
+        },
+        privateKey: ENV.REFRESH_TOKEN_PRIVATE_KEY
       })
     }
     return signToken({
@@ -69,7 +73,8 @@ class UserService {
       options: {
         expiresIn: process.env.EXPIRES_TIME_REFRESH_TOKEN as StringValue,
         algorithm: 'HS256'
-      }
+      },
+      privateKey: ENV.REFRESH_TOKEN_PRIVATE_KEY
     })
   }
   private signEmailToken({
@@ -88,10 +93,30 @@ class UserService {
       options: {
         expiresIn: process.env.EXPIRES_TIME_EMAIL_VERIFY_TOKEN as StringValue,
         algorithm: 'HS256'
-      }
+      },
+      privateKey: ENV.SEND_EMAIL_PRIVATE_KEY
     })
   }
-
+  private signForgotPasswordToken({
+    userId,
+    verify = UserVerifyStatus.Unverified
+  }: {
+    userId: string
+    verify: UserVerifyStatus
+  }) {
+    return signToken({
+      payload: {
+        userId: userId,
+        token_type: TokenType.ForgotPasswordToken,
+        verify: verify || UserVerifyStatus.Unverified
+      },
+      options: {
+        expiresIn: process.env.EXPIRES_TIME_EMAIL_VERIFY_TOKEN as StringValue,
+        algorithm: 'HS256'
+      },
+      privateKey: ENV.FORGOT_PASSWORD_PRIVATE_KEY
+    })
+  }
   getUserByEmail(email: string) {
     return databaseService.users.findOne({ email })
   }
@@ -110,9 +135,10 @@ class UserService {
     return {
       access_token,
       refresh_token,
-      user: omit(user, 'password')
+      user: omit(user, 'password', 'email_verify_token', 'forgot_password_token')
     }
   }
+  // register
   async register(payload: RegisterRequest) {
     const user_id = new ObjectId()
     const emailToken = await this.signEmailToken({
@@ -151,9 +177,11 @@ class UserService {
       user: omit(user, 'password')
     }
   }
+
   private signAccessAndRefreshToken({ userId, verify }: { userId: string; verify: UserVerifyStatus }) {
     return Promise.all([this.signAccessToken({ userId, verify }), this.signRefreshToken({ userId, verify })])
   }
+
   async logout(refreshToken: string) {
     const result = await this.removeRefreshTokenFromDatabase(refreshToken)
     if (!result.deletedCount) {
@@ -167,6 +195,7 @@ class UserService {
   private removeRefreshTokenFromDatabase(refresh_token: string) {
     return databaseService.refreshTokens.deleteOne({ token: refresh_token })
   }
+
   async refreshToken({ refresh_token, userId, verify, exp }: TokenPayload) {
     // xoa refresh token cũ, tao accesstoken moi tao rafesh token moi -> tra ve
 
@@ -205,6 +234,93 @@ class UserService {
       throw new Error(POST_MESSAGES.INTERNAL_SERVER_ERROR)
     }
     return true
+  }
+  async resendEmailVerify(email: string, user: User) {
+    const emailToken = await this.signEmailToken({
+      userId: user?._id?.toString() as string,
+      verify: UserVerifyStatus.Unverified
+    })
+
+    // send email
+    await sendRegisterEmailNodemailer(email, emailToken as string)
+    // cap nhat token
+    await databaseService.users.updateOne(
+      { _id: user?._id },
+      {
+        $set: {
+          email_verify_token: emailToken as string,
+          updated_at: new Date()
+        }
+      }
+    )
+  }
+  async forgotPassword(email: string, user: User) {
+    const forgotPasswordToken = await this.signForgotPasswordToken({
+      userId: user?._id?.toString() as string,
+      verify: user?.verify as UserVerifyStatus
+    })
+
+    // send email
+    await sendForgotPasswordNodemailer(email, forgotPasswordToken as string)
+    // cap nhat token
+    await databaseService.users.updateOne(
+      { _id: user?._id },
+      {
+        $set: {
+          forgot_password_token: forgotPasswordToken as string,
+          updated_at: new Date()
+        }
+      }
+    )
+  }
+  async resetPassword(password: string, user: User) {
+    const hashedPassword = hashPassword(password)
+    const result = await databaseService.users.updateOne(
+      { _id: user?._id },
+      {
+        $set: {
+          password: hashedPassword,
+          forgot_password_token: '',
+          updated_at: new Date()
+        }
+      }
+    )
+    if (!result.modifiedCount) {
+      throw new Error(POST_MESSAGES.INTERNAL_SERVER_ERROR)
+    }
+    return true
+  }
+  getMe = (userId: string) => {
+    return databaseService.users.findOne(
+      { _id: new ObjectId(userId) },
+      {
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0
+        }
+      }
+    )
+  }
+  async updateMe(userId: string, userUpdate: UpdateMeRequest) {
+    const _payload = userUpdate.date_of_birth
+      ? {
+          ...userUpdate,
+          date_of_birth: new Date(userUpdate.date_of_birth)
+        }
+      : userUpdate
+    const result = await databaseService.users.findOneAndUpdate(
+      { _id: new ObjectId(userId) },
+      {
+        $set: {
+          ...(_payload as UpdateMeRequest & { date_of_birth?: Date }),
+          updated_at: new Date()
+        }
+      },
+      { returnDocument: 'after', projection: { password: 0, email_verify_token: 0, forgot_password_token: 0 } }
+    )
+
+    return result
   }
 }
 const userService = new UserService()

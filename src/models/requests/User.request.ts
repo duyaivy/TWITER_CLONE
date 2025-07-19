@@ -16,3 +16,19 @@ export interface LogoutOrRefreshTokenRequest {
 export interface EmailVerifyRequest {
   email_verify_token: string
 }
+export interface ResetPasswordRequest {
+  forgot_password_token: string
+  password: string
+  confirm_password: string
+}
+export interface UpdateMeRequest {
+  name?: string
+  date_of_birth?: string
+  bio?: string
+  location?: string
+  website?: string
+  username?: string
+  avatar?: string
+  cover_photo?: string
+  password?: string
+}

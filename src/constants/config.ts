@@ -9,6 +9,10 @@ const ENV = {
   DB_REFRESH_TOKEN_COLLECTION: (process.env.DB_REFRESH_TOKEN_COLLECTION as string) || 'refresh_tokens',
   PRIVATE_PASSWORD: (process.env.PRIVATE_PASSWORD as string) || '!@#1234',
   JWT_PRIVATE_KEY: (process.env.JWT_PRIVATE_KEY as string) || '!@#1234ccc',
+  ACCESS_TOKEN_PRIVATE_KEY: (process.env.ACCESS_TOKEN_PRIVATE_KEY as string) || '!@#1234ccc',
+  REFRESH_TOKEN_PRIVATE_KEY: (process.env.REFRESH_TOKEN_PRIVATE_KEY as string) || '!@#1234ccc',
+  SEND_EMAIL_PRIVATE_KEY: (process.env.SEND_EMAIL_PRIVATE_KEY as string) || '!@#1234ccc',
+  FORGOT_PASSWORD_PRIVATE_KEY: (process.env.FORGOT_PASSWORD_PRIVATE_KEY as string) || '!@#1234ccc',
   EXPIRES_TIME_ACCESS_TOKEN: (process.env.EXPIRES_TIME_ACCESS_TOKEN as string) || '15m',
   EXPIRES_TIME_REFRESH_TOKEN: (process.env.EXPIRES_TIME_REFRESH_TOKEN as string) || '30d',
   AWS_SECRET_ACCESS_KEY: (process.env.AWS_SECRET_ACCESS_KEY as string) || '',
@@ -17,8 +21,8 @@ const ENV = {
   AWS_SES_FROM_ADDRESS: (process.env.AWS_SES_FROM_ADDRESS as string) || '',
   CLIENT_URL: (process.env.CLIENT_URL as string) || '',
   EMAIL_PASSWORD: (process.env.EMAIL_PASSWORD as string) || '',
-  EMAIL_HOST: (process.env.EMAIL_HOST as string) || 'smtp.gmail.com',
-  EMAIL_PORT: (process.env.EMAIL_PORT as string) || '587',
+  EMAIL_HOST: (process.env.EMAIL_HOST as string) || '',
+  EMAIL_PORT: (process.env.EMAIL_PORT as string) || '',
   EMAIL_USER: (process.env.EMAIL_USER as string) || ''
 } as const
 

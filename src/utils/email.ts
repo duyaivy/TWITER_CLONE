@@ -8,7 +8,7 @@ import nodemailer from 'nodemailer'
 import { ErrorWithStatus } from '~/models/Errors'
 import { HTTP_STATUS } from '~/constants/httpStatus'
 import SMTPTransport from 'nodemailer/lib/smtp-transport'
-import { send } from 'process'
+import { POST_MESSAGES } from '~/constants/messages'
 // Create SES service object.
 const sesClient = new SESClient({
   region: ENV.AWS_REGION,
@@ -105,9 +105,8 @@ export const sendEmail = async ({ to, subject, html }: { to: string; subject: st
   try {
     return await transporter.sendMail(mailOptions)
   } catch (error) {
-    console.log(error, 'loi')
-
-    throw new ErrorWithStatus('loi mail', HTTP_STATUS.INTERNAL_SERVER_ERROR)
+    console.log(error)
+    throw new ErrorWithStatus(POST_MESSAGES.EMAIL_CANT_SEND, HTTP_STATUS.INTERNAL_SERVER_ERROR)
   }
 }
 
@@ -120,9 +119,26 @@ export const sendRegisterEmailNodemailer = (
     to,
     subject: 'Verify your email',
     html: template
-      .replace('{{title}}', 'Please verify your email')
+      .replaceAll('{{title}}', 'Please verify your email')
       .replace('{{content}}', 'Click the button below to verify your email')
       .replace('{{titleLink}}', 'Verify')
       .replace('{{link}}', `${ENV.CLIENT_URL}/email-verifications?token=${email_verify_token}`)
+      .replace('{{year}}', new Date().getFullYear().toString())
+  })
+}
+export const sendForgotPasswordNodemailer = (
+  to: string,
+  forgot_password_token: string,
+  template: string = verifyEmailTemplate
+) => {
+  return sendEmail({
+    to,
+    subject: 'Resset password from Twittwer Clone',
+    html: template
+      .replaceAll('{{title}}', 'You are receiving this email because you requested to reset your password')
+      .replace('{{content}}', 'Click the button below to reset your password')
+      .replace('{{titleLink}}', 'Reset Password')
+      .replace('{{link}}', `${ENV.CLIENT_URL}/reset-password?token=${forgot_password_token}`)
+      .replace('{{year}}', new Date().getFullYear().toString())
   })
 }

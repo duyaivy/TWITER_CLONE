@@ -1,19 +1,32 @@
-import { Router, Request } from 'express'
+import { Router } from 'express'
 import {
+  emailResendController,
   emailVerifyController,
+  forgotPasswordController,
+  getMeController,
+  getProfileController,
   loginController,
   logoutController,
   refreshTokenController,
-  registerController
+  registerController,
+  resetPasswordController,
+  updateMeController
 } from '~/controllers/users.controller'
+import { filterMiddlewares } from '~/middlewares/common.middleware'
 import {
   accessTokenValidator,
   emailResendValidator,
   emailTokenValidator,
+  forgotPasswordValidator,
+  getProfileValidator,
   loginValidator,
   refreshTokenValidator,
-  registerValidator
+  registerValidator,
+  resetPasswordValidator,
+  updateMeValidator,
+  userVerifyValidator
 } from '~/middlewares/users.middlewares'
+import { UpdateMeRequest } from '~/models/requests/User.request'
 import { wrapRequestHandler } from '~/utils/handler'
 
 const usersRouter = Router()
@@ -58,8 +71,61 @@ usersRouter.post('/email-verify', emailTokenValidator, wrapRequestHandler(emailV
 /* path:users/resend-verify-email
  * Method: POST
  * Description: Resend email verification
- * payload: { email_verify_token }
+ * payload: { email }
  */
-usersRouter.post('/resend-verify-email', emailResendValidator, wrapRequestHandler(emailVerifyController))
+usersRouter.post('/resend-verify-email', emailResendValidator, wrapRequestHandler(emailResendController))
+
+/* path:users/forgot-password
+ * Method: POST
+ * Description: Forgot password
+ * payload: { email }
+ */
+usersRouter.post('/forgot-password', forgotPasswordValidator, wrapRequestHandler(forgotPasswordController))
+
+/* path:users/reset-password
+ * Method: POST
+ * Description: Reset password
+ * payload: { password, confirmPassword }
+ */
+usersRouter.post('/reset-password', resetPasswordValidator, wrapRequestHandler(resetPasswordController))
+
+/* path:users/me
+ * Method: GET
+ * Authorization: Bearer <token>
+ * Description: Get current user information
+ */
+usersRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeController))
+
+/* path:users/me
+ * Method: PATCH
+ * Authorization: Bearer <token>
+ * Description: Update current user information
+ * Payload: { name, email, date_of_birth, bio, location, website, username, avatar, cover_photo, password }
+ */
+usersRouter.patch(
+  '/me',
+  accessTokenValidator,
+  userVerifyValidator,
+  filterMiddlewares<UpdateMeRequest>([
+    'name',
+    'date_of_birth',
+    'bio',
+    'location',
+    'website',
+    'username',
+    'avatar',
+    'cover_photo',
+    'password'
+  ]),
+  updateMeValidator,
+  wrapRequestHandler(updateMeController)
+)
+
+/* path:users/get-profile/:username
+ * Method: GET
+ * Authorization: Bearer <token>
+ * Description: Get user information by username
+ */
+usersRouter.get('/get-profile/:username', getProfileValidator, wrapRequestHandler(getProfileController))
 
 export default usersRouter
