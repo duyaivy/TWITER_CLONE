@@ -51,5 +51,6 @@ export enum POST_MESSAGES {
   FOLLOWED_USER_ID_REQUIRED = 'Followed user ID is required',
   FOLLOW_USER_SUCCESS = 'Follow user success',
   UNFOLLOW_USER_SUCCESS = 'Unfollow user success',
-  FOLLOW_USER_ALREADY_EXISTS = 'You already follow this user'
+  FOLLOW_USER_ALREADY_EXISTS = 'You already follow this user',
+  NOT_FOLLOWING = 'You are not following this user'
 }

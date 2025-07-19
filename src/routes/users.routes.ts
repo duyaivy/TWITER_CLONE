@@ -11,6 +11,7 @@ import {
   refreshTokenController,
   registerController,
   resetPasswordController,
+  unfollowUserController,
   updateMeController
 } from '~/controllers/users.controller'
 import { filterMiddlewares } from '~/middlewares/common.middleware'
@@ -136,11 +137,23 @@ usersRouter.get('/get-profile/:username', getProfileValidator, wrapRequestHandle
  * payload: { followed_user_id }
  */
 usersRouter.post(
-  '/followers',
+  '/follower',
   accessTokenValidator,
   userVerifyValidator,
   followUserValidator,
   wrapRequestHandler(followUserController)
 )
-
+/* path:users/followers
+ * Method: POST
+ * Authorization: Bearer <token>
+ * Description: Follow a user
+ * payload: { followed_user_id }
+ */
+usersRouter.post(
+  '/unFollower',
+  accessTokenValidator,
+  userVerifyValidator,
+  followUserValidator,
+  wrapRequestHandler(unfollowUserController)
+)
 export default usersRouter

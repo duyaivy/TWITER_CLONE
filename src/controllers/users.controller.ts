@@ -142,3 +142,11 @@ export const followUserController = async (req: Request<ParamsDictionary, Follow
   const result = await userService.followUser(userId as string, followedUserId)
   return res.json(result)
 }
+export const unfollowUserController = async (req: Request<ParamsDictionary, FollowUserRequest>, res: Response) => {
+  const userId = req.decode_access_token?.userId
+  const followedUserId = req.body.followed_user_id
+  await userService.unfollowUser(userId as string, followedUserId)
+  return res.json({
+    message: POST_MESSAGES.UNFOLLOW_USER_SUCCESS
+  })
+}

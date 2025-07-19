@@ -12,7 +12,6 @@ import { POST_MESSAGES } from '~/constants/messages'
 import { TokenPayload } from '~/type'
 import { sendForgotPasswordNodemailer, sendRegisterEmailNodemailer } from '~/utils/email'
 import ENV from '~/constants/config'
-import e from 'express'
 import Follower from '~/models/schemas/Follower.schema'
 import { ErrorWithStatus } from '~/models/Errors'
 import { HTTP_STATUS } from '~/constants/httpStatus'
@@ -347,6 +346,15 @@ class UserService {
       return {
         message: POST_MESSAGES.FOLLOW_USER_ALREADY_EXISTS
       }
+    }
+  }
+  async unfollowUser(followed_user_id: string, user_id: string) {
+    const result = await databaseService.followers.findOneAndDelete({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    })
+    if (!result) {
+      throw new ErrorWithStatus(POST_MESSAGES.NOT_FOLLOWING, HTTP_STATUS.BAD_REQUEST)
     }
   }
 }
