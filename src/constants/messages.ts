@@ -19,7 +19,7 @@ export enum USER_MESSAGES {
   USER_NOT_VERIFIED_OR_BANNED = 'User not verified or banned',
   EMAIL_OR_PASSWORD_INCORRECT = 'Email or password is incorrect',
   LOGOUT_SUCCESS = 'Logout success',
-  INVALID_VALUE = ' Value invalid',
+  INVALID_VALUE = 'Value invalid',
   VALUE_MUST_BE_LESS_THAN_160 = 'Value must be less than 160 characters',
   VALUE_MUST_BE_BETWEEN_3_AND_50_CHARACTERS = 'Value must be between 3 and 50 characters',
   USERNAME_REQUIRED = 'Username is required'
@@ -47,5 +47,9 @@ export enum POST_MESSAGES {
   SEND_FORGOT_PASSWORD_SUCCESS = 'Send email forgot password success',
   RESET_PASSWORD_INVALID = 'Reset password invalid',
   GET_ME_SUCCESS = 'Get user information success',
-  UPDATE_ME_SUCCESS = 'Update user information success'
+  UPDATE_ME_SUCCESS = 'Update user information success',
+  FOLLOWED_USER_ID_REQUIRED = 'Followed user ID is required',
+  FOLLOW_USER_SUCCESS = 'Follow user success',
+  UNFOLLOW_USER_SUCCESS = 'Unfollow user success',
+  FOLLOW_USER_ALREADY_EXISTS = 'You already follow this user'
 }

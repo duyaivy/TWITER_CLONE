@@ -3,6 +3,7 @@ import userService from '~/services/user.services'
 import { ParamsDictionary } from 'express-serve-static-core'
 import {
   EmailVerifyRequest,
+  FollowUserRequest,
   LoginRequest,
   LogoutOrRefreshTokenRequest,
   RegisterRequest,
@@ -77,9 +78,7 @@ export const emailVerifyController = async (req: Request<ParamsDictionary, any, 
     })
   }
   // update user verify status
-  await userService.verifyEmail({
-    userId: user?._id.toString() as string
-  })
+  await userService.verifyEmail(user?._id.toString() as string)
   return res.json({
     message: POST_MESSAGES.EMAIL_VERIFY_SUCCESS
   })
@@ -130,10 +129,16 @@ export const updateMeController = async (req: Request<ParamsDictionary, any, Upd
     data: result
   })
 }
-export const getProfileController = async (req: Request<ParamsDictionary, any, {}>, res: Response) => {
+export const getProfileController = (req: Request<ParamsDictionary, any, {}>, res: Response) => {
   const user = req.user as User
   return res.json({
     message: POST_MESSAGES.GET_ME_SUCCESS,
     data: user
   })
+}
+export const followUserController = async (req: Request<ParamsDictionary, FollowUserRequest>, res: Response) => {
+  const userId = req.decode_access_token?.userId
+  const followedUserId = req.body.followed_user_id
+  const result = await userService.followUser(userId as string, followedUserId)
+  return res.json(result)
 }

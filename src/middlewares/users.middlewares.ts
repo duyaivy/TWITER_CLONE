@@ -391,10 +391,10 @@ export const getProfileValidator = validate(
     {
       username: {
         notEmpty: {
-          errorMessage: USER_MESSAGES.USERNAME_REQUIRED
+          errorMessage: new ErrorWithStatus(USER_MESSAGES.USERNAME_REQUIRED, HTTP_STATUS.BAD_REQUEST)
         },
         isString: {
-          errorMessage: USER_MESSAGES.INVALID_VALUE
+          errorMessage: new ErrorWithStatus(USER_MESSAGES.INVALID_VALUE, HTTP_STATUS.BAD_REQUEST)
         },
         trim: true,
         isLength: {
@@ -402,7 +402,10 @@ export const getProfileValidator = validate(
             min: 3,
             max: 50
           },
-          errorMessage: USER_MESSAGES.VALUE_MUST_BE_BETWEEN_3_AND_50_CHARACTERS
+          errorMessage: new ErrorWithStatus(
+            USER_MESSAGES.VALUE_MUST_BE_BETWEEN_3_AND_50_CHARACTERS,
+            HTTP_STATUS.BAD_REQUEST
+          )
         },
         custom: {
           options: async (value, { req }) => {
@@ -428,5 +431,30 @@ export const getProfileValidator = validate(
       }
     },
     ['params']
+  )
+)
+export const followUserValidator = validate(
+  checkSchema(
+    {
+      followed_user_id: {
+        notEmpty: {
+          errorMessage: new ErrorWithStatus(POST_MESSAGES.FOLLOWED_USER_ID_REQUIRED, HTTP_STATUS.BAD_REQUEST)
+        },
+        custom: {
+          options: async (value) => {
+            if (!ObjectId.isValid(value)) {
+              throw new ErrorWithStatus(USER_MESSAGES.INVALID_VALUE, HTTP_STATUS.BAD_REQUEST)
+            }
+            const followerUser = await databaseService.users.findOne({
+              _id: new ObjectId(value)
+            })
+            if (!followerUser) {
+              throw new ErrorWithStatus(POST_MESSAGES.USER_NOT_FOUND, HTTP_STATUS.NOT_FOUND)
+            }
+          }
+        }
+      }
+    },
+    ['body']
   )
 )

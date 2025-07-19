@@ -2,6 +2,7 @@ import { Collection, Db, MongoClient } from 'mongodb'
 import User from '~/models/schemas/User.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import ENV from '~/constants/config'
+import Follower from '~/models/schemas/Follower.schema'
 
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@duyedu.23c9stb.mongodb.net/?retryWrites=true&w=majority&appName=duyEdu`
 
@@ -26,6 +27,9 @@ class DBService {
   }
   get refreshTokens(): Collection<RefreshToken> {
     return this.db.collection(ENV.DB_REFRESH_TOKEN_COLLECTION)
+  }
+  get followers(): Collection<Follower> {
+    return this.db.collection(ENV.DB_FOLLOWER_COLLECTION)
   }
 }
 

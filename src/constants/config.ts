@@ -7,6 +7,7 @@ const ENV = {
   DB_NAME: (process.env.DB_NAME as string) || 'your_database_name',
   DB_USER_COLLECTION: (process.env.DB_USER_COLLECTION as string) || 'users',
   DB_REFRESH_TOKEN_COLLECTION: (process.env.DB_REFRESH_TOKEN_COLLECTION as string) || 'refresh_tokens',
+  DB_FOLLOWER_COLLECTION: (process.env.DB_FOLLOWER_COLLECTION as string) || 'followers',
   PRIVATE_PASSWORD: (process.env.PRIVATE_PASSWORD as string) || '!@#1234',
   JWT_PRIVATE_KEY: (process.env.JWT_PRIVATE_KEY as string) || '!@#1234ccc',
   ACCESS_TOKEN_PRIVATE_KEY: (process.env.ACCESS_TOKEN_PRIVATE_KEY as string) || '!@#1234ccc',

@@ -2,6 +2,7 @@ import { Router } from 'express'
 import {
   emailResendController,
   emailVerifyController,
+  followUserController,
   forgotPasswordController,
   getMeController,
   getProfileController,
@@ -17,6 +18,7 @@ import {
   accessTokenValidator,
   emailResendValidator,
   emailTokenValidator,
+  followUserValidator,
   forgotPasswordValidator,
   getProfileValidator,
   loginValidator,
@@ -123,9 +125,22 @@ usersRouter.patch(
 
 /* path:users/get-profile/:username
  * Method: GET
- * Authorization: Bearer <token>
  * Description: Get user information by username
  */
 usersRouter.get('/get-profile/:username', getProfileValidator, wrapRequestHandler(getProfileController))
+
+/* path:users/followers
+ * Method: POST
+ * Authorization: Bearer <token>
+ * Description: Follow a user
+ * payload: { followed_user_id }
+ */
+usersRouter.post(
+  '/followers',
+  accessTokenValidator,
+  userVerifyValidator,
+  followUserValidator,
+  wrapRequestHandler(followUserController)
+)
 
 export default usersRouter

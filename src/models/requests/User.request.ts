@@ -32,3 +32,6 @@ export interface UpdateMeRequest {
   cover_photo?: string
   password?: string
 }
+export interface FollowUserRequest {
+  followed_user_id: string
+}

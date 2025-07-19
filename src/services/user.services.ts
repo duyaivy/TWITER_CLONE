@@ -13,6 +13,9 @@ import { TokenPayload } from '~/type'
 import { sendForgotPasswordNodemailer, sendRegisterEmailNodemailer } from '~/utils/email'
 import ENV from '~/constants/config'
 import e from 'express'
+import Follower from '~/models/schemas/Follower.schema'
+import { ErrorWithStatus } from '~/models/Errors'
+import { HTTP_STATUS } from '~/constants/httpStatus'
 
 class UserService {
   private signAccessToken({
@@ -219,7 +222,7 @@ class UserService {
       refresh_token: new_refresh_token
     }
   }
-  async verifyEmail({ userId }: { userId: string }) {
+  async verifyEmail(userId: string) {
     const result = await databaseService.users.updateOne(
       { _id: new ObjectId(userId) },
       {
@@ -321,6 +324,30 @@ class UserService {
     )
 
     return result
+  }
+  async followUser(followed_user_id: string, user_id: string) {
+    const followerData = await databaseService.followers.findOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    })
+    if (followerData == null) {
+      const follower = new Follower({
+        user_id: new ObjectId(user_id),
+        followed_user_id: new ObjectId(followed_user_id),
+        created_at: new Date()
+      })
+      const result = await databaseService.followers.insertOne(follower)
+      if (!result.acknowledged) {
+        throw new ErrorWithStatus(POST_MESSAGES.INTERNAL_SERVER_ERROR, HTTP_STATUS.INTERNAL_SERVER_ERROR)
+      }
+      return {
+        message: POST_MESSAGES.FOLLOW_USER_SUCCESS
+      }
+    } else {
+      return {
+        message: POST_MESSAGES.FOLLOW_USER_ALREADY_EXISTS
+      }
+    }
   }
 }
 const userService = new UserService()
