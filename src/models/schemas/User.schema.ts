@@ -57,3 +57,13 @@ export default class User {
     this.cover_photo = user.cover_photo || ''
   }
 }
+
+export interface UserProfileResponse {
+  id: string
+  email: string
+  verified_email: boolean
+  name: string
+  given_name: string
+  family_name: string
+  picture: string
+}

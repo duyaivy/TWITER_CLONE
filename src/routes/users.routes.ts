@@ -9,6 +9,7 @@ import {
   getProfileController,
   loginController,
   logoutController,
+  OauthController,
   refreshTokenController,
   registerController,
   resetPasswordController,
@@ -170,4 +171,10 @@ usersRouter.post(
   followUserValidator,
   wrapRequestHandler(unfollowUserController)
 )
+/* path:users/google
+ * Method: GET
+ * Description: Google OAuth login
+ * query: { code }
+ */
+usersRouter.get('/google', wrapRequestHandler(OauthController))
 export default usersRouter

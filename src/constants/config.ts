@@ -24,7 +24,12 @@ const ENV = {
   EMAIL_PASSWORD: (process.env.EMAIL_PASSWORD as string) || '',
   EMAIL_HOST: (process.env.EMAIL_HOST as string) || '',
   EMAIL_PORT: (process.env.EMAIL_PORT as string) || '',
-  EMAIL_USER: (process.env.EMAIL_USER as string) || ''
+  EMAIL_USER: (process.env.EMAIL_USER as string) || '',
+  GOOGLE_CLIENT_SECRET: (process.env.GOOGLE_CLIENT_SECRET as string) || '',
+  GOOGLE_CLIENT_ID: (process.env.GOOGLE_CLIENT_ID as string) || '',
+  GOOGLE_REDIRECT_URI: (process.env.GOOGLE_REDIRECT_URI as string) || '',
+  TOKEN_URI: (process.env.TOKEN_URI as string) || 'https://oauth2.googleapis.com/token',
+  CLIENT_REDIRECT_URI: (process.env.CLIENT_REDIRECT_URI as string) || ''
 } as const
 
 export default ENV

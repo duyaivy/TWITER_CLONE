@@ -1,4 +1,4 @@
-import User from '~/models/schemas/User.schema'
+import User, { UserProfileResponse } from '~/models/schemas/User.schema'
 import databaseService from './database.services'
 import { hashPassword } from '~/utils/crypto'
 import { signToken } from '~/utils/jwt'
@@ -15,6 +15,8 @@ import ENV from '~/constants/config'
 import Follower from '~/models/schemas/Follower.schema'
 import { ErrorWithStatus } from '~/models/Errors'
 import { HTTP_STATUS } from '~/constants/httpStatus'
+import axios from 'axios'
+import { randomPassword } from '~/utils/random'
 
 class UserService {
   private signAccessToken({
@@ -378,6 +380,60 @@ class UserService {
     })
     if (!result) {
       throw new ErrorWithStatus(POST_MESSAGES.NOT_FOLLOWING, HTTP_STATUS.BAD_REQUEST)
+    }
+  }
+  async getOauthGoogleToken(code: string) {
+    const body = {
+      code,
+      client_id: ENV.GOOGLE_CLIENT_ID,
+      client_secret: ENV.GOOGLE_CLIENT_SECRET,
+      redirect_uri: ENV.GOOGLE_REDIRECT_URI,
+      grant_type: 'authorization_code'
+    }
+    const { data } = await axios.post('https://oauth2.googleapis.com/token', body, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    })
+    return data
+  }
+  async getOauthGoogleProfile(access_token: string, id_token: string): Promise<UserProfileResponse> {
+    const { data } = await axios.get('https://www.googleapis.com/oauth2/v1/userinfo', {
+      params: {
+        access_token,
+        alt: 'json'
+      },
+      headers: {
+        Authorization: `Bearer ${id_token}`
+      }
+    })
+    return data
+  }
+  async googleOauth(code: string) {
+    // Handle Google OAuth login logic here
+    const { id_token, access_token } = await this.getOauthGoogleToken(code)
+    if (!id_token || !access_token) {
+      throw new ErrorWithStatus(POST_MESSAGES.GOOGLE_OAUTH_ERROR, HTTP_STATUS.BAD_REQUEST)
+    }
+    const profile = await this.getOauthGoogleProfile(access_token, id_token)
+    if (!profile.verified_email) {
+      throw new ErrorWithStatus(POST_MESSAGES.EMAIL_NOT_VERIFIED, HTTP_STATUS.BAD_REQUEST)
+    }
+
+    const user = await this.getUserByEmail(profile.email)
+    if (user) {
+      const data = await this.login(user)
+      return data
+    } else {
+      const password = randomPassword()
+      const data = await this.register({
+        email: profile.email,
+        password,
+        name: profile.name,
+        confirm_password: password,
+        date_of_birth: new Date().toISOString()
+      })
+      return data
     }
   }
 }

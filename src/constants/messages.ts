@@ -56,5 +56,7 @@ export enum POST_MESSAGES {
   FOLLOW_USER_SUCCESS = 'Follow user success',
   UNFOLLOW_USER_SUCCESS = 'Unfollow user success',
   FOLLOW_USER_ALREADY_EXISTS = 'You already follow this user',
-  NOT_FOLLOWING = 'You are not following this user'
+  NOT_FOLLOWING = 'You are not following this user',
+  GOOGLE_OAUTH_ERROR = 'Google OAuth error, please try again later',
+  EMAIL_NOT_VERIFIED = 'Email not verified, please verify your email first'
 }

@@ -17,6 +17,7 @@ import { TokenPayload } from '~/type'
 import { TokenType, UserVerifyStatus } from '~/constants/enum'
 import databaseService from '~/services/database.services'
 import { ObjectId } from 'mongodb'
+import ENV from '~/constants/config'
 
 export const loginController = async (req: Request<ParamsDictionary, any, LoginRequest>, res: Response) => {
   // check email
@@ -159,4 +160,10 @@ export const unfollowUserController = async (req: Request<ParamsDictionary, Foll
   return res.json({
     message: POST_MESSAGES.UNFOLLOW_USER_SUCCESS
   })
+}
+export const OauthController = async (req: Request<ParamsDictionary, any, {}>, res: Response) => {
+  const { code } = req.query
+  const result = await userService.googleOauth(code as string)
+  const url = `${ENV.CLIENT_REDIRECT_URI}?access_token=${result.access_token}&refresh_token=${result.refresh_token}&user_infor=${result.user._id}`
+  return res.redirect(url)
 }
