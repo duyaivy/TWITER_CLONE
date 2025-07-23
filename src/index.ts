@@ -2,16 +2,20 @@ import express from 'express'
 import usersRouter from './routes/users.routes'
 import databaseService from './services/database.services'
 import { defaultErrorHandler } from './middlewares/errors.middlewares'
+import mediasRouter from './routes/medias.routes'
+import { initialUploadFolder } from './utils/file'
+import ENV from './constants/config'
 const app = express()
-const port = 3000
+const port = ENV.SERVER_PORT
 
+initialUploadFolder()
 app.get('/', (req, res) => {
   res.send('cmm')
 })
-
 app.use(express.json())
 databaseService.connect()
 app.use('/users', usersRouter)
+app.use('/medias', mediasRouter)
 // handle errors globally
 app.use(defaultErrorHandler)
 app.listen(port, () => {
