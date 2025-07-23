@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import sharp from 'sharp'
-import ENV from '~/constants/config'
+import ENV, { isDevelopment } from '~/constants/config'
 
 import { PATH_UPLOAD } from '~/constants/URL'
 
@@ -11,7 +11,9 @@ class MediaService {
     const file = await uploadSingleImage(req)
     const newName = `${PATH_UPLOAD}/${getNameFromFullname(file.newFilename)}.jpg`
     await sharp(file.filepath).jpeg().toFile(newName)
-    return `${ENV.SERVER_URL}/uploads/${getNameFromFullname(file.newFilename)}.jpg`
+    return isDevelopment
+      ? `http://localhost:${ENV.SERVER_PORT}/static/${getNameFromFullname(file.newFilename)}.jpg`
+      : `${ENV.HOST}/static/${getNameFromFullname(file.newFilename)}.jpg`
   }
 }
 const mediaService = new MediaService()

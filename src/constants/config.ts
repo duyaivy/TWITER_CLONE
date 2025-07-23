@@ -31,7 +31,8 @@ const ENV = {
   TOKEN_URI: (process.env.TOKEN_URI as string) || 'https://oauth2.googleapis.com/token',
   CLIENT_REDIRECT_URI: (process.env.CLIENT_REDIRECT_URI as string) || '',
   SERVER_PORT: (process.env.SERVER_PORT as string) || '3000',
-  SERVER_URL: (process.env.SERVER_URL as string) || 'http://localhost:3000'
+  HOST: process.env.HOST as string
 } as const
 
 export default ENV
+export const isDevelopment = process.env.NODE_ENV === 'development'
