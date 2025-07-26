@@ -3,6 +3,7 @@ import User from '~/models/schemas/User.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import ENV from '~/constants/config'
 import Follower from '~/models/schemas/Follower.schema'
+import VideoStatus from '~/models/schemas/VideoStatus.schema'
 
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@duyedu.23c9stb.mongodb.net/?retryWrites=true&w=majority&appName=duyEdu`
 
@@ -30,6 +31,9 @@ class DBService {
   }
   get followers(): Collection<Follower> {
     return this.db.collection(ENV.DB_FOLLOWER_COLLECTION)
+  }
+  get videoStatuses(): Collection<VideoStatus> {
+    return this.db.collection(ENV.DB_VIDEO_STATUS_COLLECTION)
   }
 }
 

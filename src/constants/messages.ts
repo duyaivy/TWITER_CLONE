@@ -65,5 +65,8 @@ export enum MEDIA_MESSAGES {
   UPLOAD_SUCCESS = 'Upload success',
   UPLOAD_ERROR = 'Upload error',
   INVALID_FILE_TYPE = 'Invalid file type',
-  FILE_IS_EMPTY = 'File is empty, please select a file to upload'
+  FILE_IS_EMPTY = 'File is empty, please select a file to upload',
+  FILE_NOT_FOUND = 'File not found',
+  REQUIRE_RANGE = 'Require range header',
+  CHECK_STATUS_SUCCESS = 'Check status success'
 }
