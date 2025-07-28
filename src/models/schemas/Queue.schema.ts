@@ -4,6 +4,7 @@ import videoStatusService from '~/services/videoStatus.services'
 import { MediaStatus } from '~/constants/enum'
 import { ObjectId } from 'mongodb'
 import { ErrorWithStatus } from '../Errors'
+import { MEDIA_MESSAGES } from '~/constants/messages'
 
 interface VideoQueueItem {
   filePath: string
@@ -20,7 +21,7 @@ class Queue {
   async addToQueue(filePath: string, fileId: string, fileName: string) {
     this.items.push({ filePath, fileId, fileName })
     await videoStatusService
-      .createVideoStatus(new ObjectId(fileId), fileName, MediaStatus.Processing)
+      .createVideoStatus(new ObjectId(fileId), fileName, MediaStatus.Processing, MEDIA_MESSAGES.VIDEO_UPLOAD_PROCESSING)
       .catch((error) => {
         throw new ErrorWithStatus(`Failed to create video status: ${error.message}`, 500)
       })
@@ -33,7 +34,11 @@ class Queue {
             await encodeHLSWithMultipleVideoStreams(currentFile.filePath)
             await fs.promises.unlink(currentFile.filePath) // Xóa file sau khi đã mã hóa
             await videoStatusService
-              .updateVideoStatus(new ObjectId(currentFile.fileId), MediaStatus.Done)
+              .updateVideoStatus(
+                new ObjectId(currentFile.fileId),
+                MediaStatus.Done,
+                MEDIA_MESSAGES.VIDEO_UPLOAD_SUCCESS
+              )
               .catch((error) => {
                 console.log(`Failed to update video status: ${error.message}`)
               })
@@ -41,7 +46,11 @@ class Queue {
           } catch (error) {
             console.error('Error encoding video:', error)
             await videoStatusService
-              .updateVideoStatus(new ObjectId(currentFile.fileId), MediaStatus.Failed)
+              .updateVideoStatus(
+                new ObjectId(currentFile.fileId),
+                MediaStatus.Failed,
+                MEDIA_MESSAGES.VIDEO_UPLOAD_FAILED
+              )
               .catch((error) => {
                 console.log(`Failed to update video status: ${error.message}`)
               })

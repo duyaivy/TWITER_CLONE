@@ -4,17 +4,18 @@ import databaseService from './database.services'
 import { ObjectId } from 'mongodb'
 
 class VideoStatusService {
-  async createVideoStatus(_id: ObjectId, name: string, status = MediaStatus.Processing) {
+  async createVideoStatus(_id: ObjectId, name: string, status = MediaStatus.Processing, message?: string) {
     const videoStatus = new VideoStatus({
       _id,
       name,
       status,
+      message: message || '',
       created_at: new Date(),
       updated_at: new Date()
     })
     await databaseService.videoStatuses.insertOne(videoStatus)
   }
-  async updateVideoStatus(id: ObjectId, status = MediaStatus.Processing) {
+  async updateVideoStatus(id: ObjectId, status = MediaStatus.Processing, message?: string) {
     await databaseService.videoStatuses.updateOne(
       {
         _id: id
@@ -22,7 +23,8 @@ class VideoStatusService {
       {
         $set: {
           status,
-          updated_at: new Date()
+          updated_at: new Date(),
+          message: message || ''
         }
       }
     )

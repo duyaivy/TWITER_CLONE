@@ -1,9 +1,9 @@
-import { Response, Request } from 'express'
+import { NextFunction, Response, Request } from 'express'
 import { omit } from 'lodash'
 import { HTTP_STATUS } from '~/constants/httpStatus'
 import { EntityError, ErrorWithStatus } from '~/models/Errors'
 
-export const defaultErrorHandler = (err: any, req: Request, res: Response) => {
+export const defaultErrorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
   try {
     if (err instanceof EntityError) {
       return res.status(err.status).json({ message: err.message, errors: err.errors || {} })

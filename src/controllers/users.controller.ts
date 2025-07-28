@@ -57,7 +57,8 @@ export const refreshTokenController = async (
     userId: payload?.userId,
     token_type: TokenType.RefreshToken,
     verify: payload?.verify,
-    exp: payload?.exp
+    exp: payload?.exp,
+    iat: payload?.iat
   } as TokenPayload)
   return res.json({
     message: POST_MESSAGES.REFRESH_TOKEN_SUCCESS,

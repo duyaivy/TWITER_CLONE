@@ -1,7 +1,7 @@
 import User, { UserProfileResponse } from '~/models/schemas/User.schema'
 import databaseService from './database.services'
 import { hashPassword } from '~/utils/crypto'
-import { signToken } from '~/utils/jwt'
+import { signToken, verifyToken } from '~/utils/jwt'
 import { TokenType, UserVerifyStatus } from '~/constants/enum'
 import { RegisterRequest, UpdateMeRequest } from '~/models/requests/User.request'
 import { StringValue } from 'ms'
@@ -16,7 +16,7 @@ import Follower from '~/models/schemas/Follower.schema'
 import { ErrorWithStatus } from '~/models/Errors'
 import { HTTP_STATUS } from '~/constants/httpStatus'
 import axios from 'axios'
-import { randomPassword } from '~/utils/random'
+import { randomPassword, randomUsername } from '~/utils/random'
 
 class UserService {
   private signAccessToken({
@@ -130,10 +130,16 @@ class UserService {
       verify: user.verify || UserVerifyStatus.Unverified
     })
     // Save refresh token to database
+    const { iat, exp } = await verifyToken({
+      token: refresh_token as string,
+      secretOrPublicKey: ENV.REFRESH_TOKEN_PRIVATE_KEY
+    })
     const refreshToken = new RefreshToken({
       token: refresh_token as string,
       user_id: new ObjectId(user._id?.toString() as string),
-      created_at: new Date()
+      created_at: new Date(),
+      iat: new Date((iat as number) * 1000),
+      exp: new Date((exp as number) * 1000)
     })
     await this.addRefreshTokenToDatabase(refreshToken)
     return {
@@ -149,6 +155,7 @@ class UserService {
       userId: user_id.toString(),
       verify: UserVerifyStatus.Unverified
     })
+
     const user = new User({
       ...payload,
       _id: user_id,
@@ -156,6 +163,7 @@ class UserService {
       password: hashPassword(payload.password),
       created_at: new Date(),
       updated_at: new Date(),
+      username: randomUsername(payload.name),
       email_verify_token: emailToken as string
     })
     // send email
@@ -168,17 +176,23 @@ class UserService {
       verify: UserVerifyStatus.Unverified
     })
     // Save refresh token to database
+    const { iat, exp } = await verifyToken({
+      token: refresh_token as string,
+      secretOrPublicKey: ENV.REFRESH_TOKEN_PRIVATE_KEY
+    })
     const refreshToken = new RefreshToken({
       token: refresh_token as string,
-      user_id: new ObjectId(userId),
-      created_at: new Date()
+      user_id: new ObjectId(user._id?.toString() as string),
+      created_at: new Date(),
+      iat: new Date((iat as number) * 1000),
+      exp: new Date((exp as number) * 1000)
     })
     await this.addRefreshTokenToDatabase(refreshToken)
 
     return {
       access_token,
       refresh_token,
-      user: omit(user, 'password')
+      user: omit(user, 'password', 'email_verify_token', 'forgot_password_token')
     }
   }
 
@@ -200,9 +214,8 @@ class UserService {
     return databaseService.refreshTokens.deleteOne({ token: refresh_token })
   }
 
-  async refreshToken({ refresh_token, userId, verify, exp }: TokenPayload) {
+  async refreshToken({ refresh_token, userId, verify, exp, iat }: TokenPayload) {
     // xoa refresh token cũ, tao accesstoken moi tao rafesh token moi -> tra ve
-
     const [access_token, new_refresh_token, result] = await Promise.all([
       this.signAccessToken({ userId, verify }),
       this.signRefreshToken({ userId, verify, exp }),
@@ -211,13 +224,15 @@ class UserService {
     if (!result.deletedCount) {
       throw new Error(POST_MESSAGES.INTERNAL_SERVER_ERROR)
     }
-    await this.addRefreshTokenToDatabase(
-      new RefreshToken({
-        token: new_refresh_token as string,
-        user_id: new ObjectId(userId),
-        created_at: new Date()
-      })
-    )
+
+    const refreshToken = new RefreshToken({
+      token: new_refresh_token as string,
+      user_id: new ObjectId(userId),
+      created_at: new Date(),
+      iat: new Date((iat as number) * 1000),
+      exp: new Date((exp as number) * 1000)
+    })
+    await this.addRefreshTokenToDatabase(refreshToken)
     return {
       access_token,
       refresh_token: new_refresh_token

@@ -23,6 +23,52 @@ class DBService {
       throw error
     }
   }
+  async indexUser() {
+    try {
+      const existIndex = await this.users.indexExists(['email_1', 'email_1_password_1', 'username_1'])
+      if (existIndex) {
+        console.log('User indexes already exist')
+      } else {
+        await Promise.all([
+          this.users.createIndex({ email: 1, password: 1 }, { unique: true }),
+          this.users.createIndex({ email: 1 }, { unique: true }),
+          this.users.createIndex({ username: 1 }, { unique: true })
+        ])
+        console.log('User indexes created successfully')
+      }
+    } catch (error) {
+      console.log('Error creating user indexes:', error)
+    }
+  }
+  async indexRefreshTokens() {
+    try {
+      const existIndex = await this.refreshTokens.indexExists(['token_1', 'exp_1'])
+      if (existIndex) {
+        console.log('Refresh token indexes already exist')
+      } else {
+        await Promise.all([
+          this.refreshTokens.createIndex({ token: 1 }, { unique: true }),
+          this.refreshTokens.createIndex({ exp: 1 }, { expireAfterSeconds: 0 })
+        ])
+        console.log('Refresh token indexes created successfully')
+      }
+    } catch (error) {
+      console.log('Error creating refresh token indexes:', error)
+    }
+  }
+  async indexFollowers() {
+    try {
+      const existIndex = await this.followers.indexExists(['user_id_1_followed_user_id_1'])
+      if (existIndex) {
+        console.log('Follower indexes already exist')
+      } else {
+        await this.followers.createIndex({ user_id: 1, followed_user_id: 1 })
+        console.log('Follower indexes created successfully')
+      }
+    } catch (error) {
+      console.log('Error creating follower indexes:', error)
+    }
+  }
   get users(): Collection<User> {
     return this.db.collection(ENV.DB_USER_COLLECTION)
   }

@@ -15,7 +15,9 @@ app.get('/', (req, res) => {
   res.send('cmm')
 })
 app.use(express.json())
-databaseService.connect()
+databaseService.connect().then(() => {
+  Promise.all([databaseService.indexUser(), databaseService.indexFollowers(), databaseService.indexRefreshTokens()])
+})
 
 app.use(cors())
 
