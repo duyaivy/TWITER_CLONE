@@ -7,6 +7,7 @@ const ENV = {
   DB_NAME: (process.env.DB_NAME as string) || 'your_database_name',
   DB_USER_COLLECTION: (process.env.DB_USER_COLLECTION as string) || 'users',
   DB_REFRESH_TOKEN_COLLECTION: (process.env.DB_REFRESH_TOKEN_COLLECTION as string) || 'refresh_tokens',
+  DB_VIDEO_STATUS_COLLECTION: (process.env.DB_VIDEO_STATUS_COLLECTION as string) || 'video_statuses',
   DB_FOLLOWER_COLLECTION: (process.env.DB_FOLLOWER_COLLECTION as string) || 'followers',
   PRIVATE_PASSWORD: (process.env.PRIVATE_PASSWORD as string) || '!@#1234',
   JWT_PRIVATE_KEY: (process.env.JWT_PRIVATE_KEY as string) || '!@#1234ccc',
@@ -29,7 +30,19 @@ const ENV = {
   GOOGLE_CLIENT_ID: (process.env.GOOGLE_CLIENT_ID as string) || '',
   GOOGLE_REDIRECT_URI: (process.env.GOOGLE_REDIRECT_URI as string) || '',
   TOKEN_URI: (process.env.TOKEN_URI as string) || 'https://oauth2.googleapis.com/token',
-  CLIENT_REDIRECT_URI: (process.env.CLIENT_REDIRECT_URI as string) || ''
+  CLIENT_REDIRECT_URI: (process.env.CLIENT_REDIRECT_URI as string) || '',
+  SERVER_PORT: (process.env.SERVER_PORT as string) || '3000',
+  HOST: process.env.HOST as string
 } as const
 
 export default ENV
+export const isDevelopment = process.env.NODE_ENV === 'development'
+export const CONFIG = {
+  MAX_IMAGE_SIZE: 2 * 1024 * 1024, // 2MB
+  MAX_TOTAL_IMAGE_SIZE: 4 * 2 * 1024 * 1024, // 8MB
+  MAX_IMAGE_FILES: 4,
+  MAX_VIDEO_SIZE: 50 * 1024 * 1024, // 50MB
+  MAX_VIDEO_FILES: 1,
+  CHUNK_SIZE: 10 ** 6 //1mb
+}
+export const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime']

@@ -60,3 +60,16 @@ export enum POST_MESSAGES {
   GOOGLE_OAUTH_ERROR = 'Google OAuth error, please try again later',
   EMAIL_NOT_VERIFIED = 'Email not verified, please verify your email first'
 }
+
+export enum MEDIA_MESSAGES {
+  UPLOAD_SUCCESS = 'Upload success',
+  UPLOAD_ERROR = 'Upload error',
+  INVALID_FILE_TYPE = 'Invalid file type',
+  FILE_IS_EMPTY = 'File is empty, please select a file to upload',
+  FILE_NOT_FOUND = 'File not found',
+  REQUIRE_RANGE = 'Require range header',
+  CHECK_STATUS_SUCCESS = 'Check status success',
+  VIDEO_UPLOAD_SUCCESS = 'Video upload success',
+  VIDEO_UPLOAD_FAILED = 'Video upload failed',
+  VIDEO_UPLOAD_PROCESSING = 'Video upload processing'
+}

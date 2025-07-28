@@ -1,3 +1,5 @@
+import { nanoid } from 'nanoid'
+
 export const randomPassword = (length: number = 12): string => {
   const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+[]{}|;:,.<>?'
   let password = ''
@@ -6,4 +8,7 @@ export const randomPassword = (length: number = 12): string => {
     password += charset[randomIndex]
   }
   return password
+}
+export const randomUsername = (name: string) => {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, '_') + '_' + nanoid(6)
 }

@@ -11,3 +11,14 @@ export enum TokenType {
   ResetPasswordToken,
   EmailVerifyToken
 }
+
+export enum MediaType {
+  Image,
+  Video,
+  VideoHLS
+}
+export enum MediaStatus {
+  Processing, // đang xử lý
+  Done, // đã xử lý
+  Failed // xử lý thất bại
+}
