@@ -22,3 +22,13 @@ export enum MediaStatus {
   Done, // đã xử lý
   Failed // xử lý thất bại
 }
+export enum TweetAudience {
+  Everyone, // 0
+  TwitterCircle // 1
+}
+export enum TweetType {
+  Tweet,
+  Retweet,
+  Comment,
+  QuoteTweet
+}

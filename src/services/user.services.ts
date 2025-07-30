@@ -124,6 +124,9 @@ class UserService {
   getUserByEmail(email: string) {
     return databaseService.users.findOne({ email })
   }
+  getUserById(userId: string) {
+    return databaseService.users.findOne({ _id: new ObjectId(userId) })
+  }
   async login(user: User) {
     const [access_token, refresh_token] = await this.signAccessAndRefreshToken({
       userId: user._id?.toString() as string,

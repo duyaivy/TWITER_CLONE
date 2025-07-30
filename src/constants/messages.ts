@@ -73,3 +73,21 @@ export enum MEDIA_MESSAGES {
   VIDEO_UPLOAD_FAILED = 'Video upload failed',
   VIDEO_UPLOAD_PROCESSING = 'Video upload processing'
 }
+export enum TWEET_MESSAGES {
+  TYPE_INVALID = 'Invalid tweet type',
+  AUDIENCE_INVALID = 'Invalid tweet audience',
+  CONTENT_REQUIRED = 'Tweet content is required',
+  PARENT_ID_REQUIRED_OR_NOT_FOUND = 'Parent tweet ID is required or not found',
+  PARENT_ID_MUST_BE_NULL = 'Parent tweet ID must be null for a tweet',
+  CONTENT_MUST_BE_EMPTY = 'Content must be empty for a retweet',
+  HASHTAGS_MUST_BE_ARRAY_OF_STRINGS = 'Hashtags must be an array of strings',
+  MENTIONS_MUST_BE_ARRAY_OF_USER_IDS = 'Mentions must be an array of user IDs',
+  MEDIAS_MUST_BE_ARRAY_OF_MEDIAS = 'Medias must be an array of media objects',
+  CONTENT_TOO_LONG = 'Tweet content must be less than 280 characters',
+  CREATE_NEW_TWEET_SUCCESS = 'Create new tweet success',
+  TWEET_ID_REQUIRED = 'Tweet ID is required',
+  CREATE_NEW_BOOKMARK_SUCCESS = 'Create new bookmark success',
+  UN_BOOKMARK_SUCCESS = 'Un-bookmark success',
+  TWEET_NOT_FOUND = 'Tweet not found',
+  INVALID_TWEET_ID = 'Invalid tweet ID'
+}
