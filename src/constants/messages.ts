@@ -58,7 +58,8 @@ export enum POST_MESSAGES {
   FOLLOW_USER_ALREADY_EXISTS = 'You already follow this user',
   NOT_FOLLOWING = 'You are not following this user',
   GOOGLE_OAUTH_ERROR = 'Google OAuth error, please try again later',
-  EMAIL_NOT_VERIFIED = 'Email not verified, please verify your email first'
+  EMAIL_NOT_VERIFIED = 'Email not verified, please verify your email first',
+  USER_NOT_FOUND_OR_TOKEN_INVALID = 'User not found or token invalid'
 }
 
 export enum MEDIA_MESSAGES {
@@ -91,5 +92,8 @@ export enum TWEET_MESSAGES {
   TWEET_NOT_FOUND = 'Tweet not found',
   INVALID_TWEET_ID = 'Invalid tweet ID',
   GET_TWEET_SUCCESS = 'Get tweet success',
-  AUTHOR_HAS_BEEN_BANNED = 'Author has been banned'
+  AUTHOR_HAS_BEEN_BANNED = 'Author has been banned',
+  TWEET_IS_NOT_PUBLIC = 'Tweet is not public',
+  LIKE_TWEET_SUCCESS = 'Like tweet success',
+  UNLIKE_TWEET_SUCCESS = 'Unlike tweet success'
 }

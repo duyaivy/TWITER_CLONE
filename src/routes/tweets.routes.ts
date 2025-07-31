@@ -1,5 +1,10 @@
 import { Router } from 'express'
-import { createTweetController, getTweetController } from '~/controllers/tweets.controller'
+import {
+  createTweetController,
+  getTweetController,
+  likeTweetController,
+  unlikeTweetController
+} from '~/controllers/tweets.controller'
 import { tweetIdValidator } from '~/middlewares/bookmarks.middlewares'
 import { checkPrivacyValidator, createTweetValidator } from '~/middlewares/tweets.middlewares'
 import { accessTokenValidator, isLoggedInValidator, userVerifyValidator } from '~/middlewares/users.middlewares'
@@ -35,4 +40,31 @@ tweetsRouter.get(
   checkPrivacyValidator,
   wrapRequestHandler(getTweetController)
 )
+/* path: tweets/likes
+ * Method: POST
+ * authorization: Bearer <token>
+ * Description: like a tweet
+ */
+
+tweetsRouter.post(
+  '/:tweet_id/likes',
+  tweetIdValidator,
+  accessTokenValidator,
+  userVerifyValidator,
+  wrapRequestHandler(likeTweetController)
+)
+/* path: tweets/:tweet_id/likes
+ * Method: DELETE
+ * authorization: Bearer <token>
+ * Description: unlike a tweet
+ */
+
+tweetsRouter.delete(
+  '/:tweet_id/likes',
+  tweetIdValidator,
+  accessTokenValidator,
+  userVerifyValidator,
+  wrapRequestHandler(unlikeTweetController)
+)
+
 export default tweetsRouter

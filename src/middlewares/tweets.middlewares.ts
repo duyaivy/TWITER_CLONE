@@ -140,21 +140,25 @@ export const createTweetValidator = validate(
 // neu là circle thi kiem tra
 // kiem tra tai khoan cua nguoi tao co bi khoa hay kh
 export const checkPrivacyValidator = wrapRequestHandler(async (req: Request, res: Response, next: NextFunction) => {
-  const { userId } = req.decode_access_token as TokenPayload
-  const { tweetId } = req.params
-  const tweet = await tweetService.getTweetById(tweetId)
+  const tweet = req.tweet
   if (!tweet) {
     throw new ErrorWithStatus(TWEET_MESSAGES.TWEET_NOT_FOUND, HTTP_STATUS.NOT_FOUND)
-  } else if (tweet.audience === TweetAudience.TwitterCircle) {
+  }
+  if (tweet.audience === TweetAudience.TwitterCircle) {
     //author validate
     const author = await userService.getUserById(tweet.user_id.toString())
     if (!author || author?.verify === UserVerifyStatus.Banned) {
       throw new ErrorWithStatus(TWEET_MESSAGES.AUTHOR_HAS_BEEN_BANNED, HTTP_STATUS.BAD_REQUEST)
     }
     // kiem tra nguoi truy cap co nam trong vong hoac la tac gia hay kh
-    const isInTwitterCircle = author.twitter_circle.some((id: ObjectId) => id.equals(userId))
-    if (!isInTwitterCircle && !author._id.equals(userId)) {
-      throw new ErrorWithStatus(POST_MESSAGES.FORBIDDEN, HTTP_STATUS.FORBIDDEN)
+    const { userId } = (req.decode_access_token as TokenPayload) || {}
+
+    if (!userId) {
+      throw new ErrorWithStatus(TWEET_MESSAGES.TWEET_IS_NOT_PUBLIC, HTTP_STATUS.FORBIDDEN)
+    }
+    const isInTwitterCircle = author.twitter_circle.some((id: ObjectId) => id.equals(new ObjectId(userId)))
+    if (!isInTwitterCircle && !new ObjectId(author._id).equals(new ObjectId(userId))) {
+      throw new ErrorWithStatus(TWEET_MESSAGES.TWEET_IS_NOT_PUBLIC, HTTP_STATUS.FORBIDDEN)
     }
     next()
   }

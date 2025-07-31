@@ -185,7 +185,6 @@ export const userVerifyValidator = (req: Request, res: Response, next: NextFunct
     (req?.decode_refresh_token as TokenPayload)
   // Extract verify status from the token payload
   const verify = tokenPayload?.verify
-
   // Check if user is verified and not banned
   if (verify === undefined || verify === UserVerifyStatus.Banned || verify === UserVerifyStatus.Unverified) {
     return next(new ErrorWithStatus(POST_MESSAGES.FORBIDDEN, HTTP_STATUS.FORBIDDEN))
@@ -308,7 +307,7 @@ export const resetPasswordValidator = validate(
             const user = await databaseService.users.findOne({ _id: new ObjectId(forgotPasswordPayload.userId) })
 
             if (!user || user.forgot_password_token !== value) {
-              throw new ErrorWithStatus(POST_MESSAGES.USER_NOT_FOUND, HTTP_STATUS.NOT_FOUND)
+              throw new ErrorWithStatus(POST_MESSAGES.USER_NOT_FOUND_OR_TOKEN_INVALID, HTTP_STATUS.NOT_FOUND)
             }
             // check if user is banned or unverified
             else if (user?.verify === UserVerifyStatus.Banned || user?.verify === UserVerifyStatus.Unverified) {
@@ -490,7 +489,7 @@ export const isLoggedInValidator = (
   return (req: Request, res: Response, next: NextFunction) => {
     // neu co thi chay
     if (req.headers.authorization) {
-      middleWares(req, res, next)
+      return middleWares(req, res, next)
     }
     next()
   }
