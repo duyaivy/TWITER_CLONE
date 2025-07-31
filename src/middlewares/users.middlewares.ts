@@ -102,7 +102,6 @@ const confirmPasswordSchema: ParamSchema = {
     }
   }
 }
-
 const emailSchema = (customValidator: (value: string, meta: Meta) => Promise<boolean>) =>
   checkSchema(
     {
@@ -324,7 +323,6 @@ export const resetPasswordValidator = validate(
     ['body']
   )
 )
-
 export const updateMeValidator = validate(
   checkSchema(
     {
@@ -486,3 +484,14 @@ export const followUserValidator = validate(
     ['body']
   )
 )
+export const isLoggedInValidator = (
+  middleWares: (request: Request, response: Response, nextFunction: NextFunction) => void
+) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    // neu co thi chay
+    if (req.headers.authorization) {
+      middleWares(req, res, next)
+    }
+    next()
+  }
+}

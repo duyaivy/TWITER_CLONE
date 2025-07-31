@@ -5,7 +5,7 @@ import { ErrorWithStatus } from '~/models/Errors'
 import tweetService from '~/services/tweet.services'
 import { validate } from '~/utils/validation'
 
-export const bookmarkValidator = validate(
+export const tweetIdValidator = validate(
   checkSchema(
     {
       tweet_id: {

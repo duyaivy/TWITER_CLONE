@@ -1,14 +1,18 @@
+import { NextFunction, Request, Response } from 'express'
 import { checkSchema } from 'express-validator'
 import { isEmpty } from 'lodash'
 import { ObjectId } from 'mongodb'
-import { TweetAudience, TweetType } from '~/constants/enum'
+import { TweetAudience, TweetType, UserVerifyStatus } from '~/constants/enum'
 import { HTTP_STATUS } from '~/constants/httpStatus'
-import { TWEET_MESSAGES } from '~/constants/messages'
+import { POST_MESSAGES, TWEET_MESSAGES, USER_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Errors'
 import Media from '~/models/schemas/File.schema'
 import databaseService from '~/services/database.services'
 import tweetService from '~/services/tweet.services'
+import userService from '~/services/user.services'
+import { TokenPayload } from '~/type'
 import { numberEnumToArray } from '~/utils/commons'
+import { wrapRequestHandler } from '~/utils/handler'
 import { validate } from '~/utils/validation'
 
 const tweetType = numberEnumToArray(TweetType)
@@ -38,8 +42,8 @@ export const createTweetValidator = validate(
             const type = req.body.type
             // neu la tweet thi khong co parent_id
             if (type === TweetType.Tweet) {
-              if (value != null) {
-                throw new Error(TWEET_MESSAGES.PARENT_ID_MUST_BE_NULL)
+              if (value) {
+                throw new ErrorWithStatus(TWEET_MESSAGES.PARENT_ID_MUST_BE_NULL, HTTP_STATUS.BAD_REQUEST)
               }
               return true
             } else {
@@ -70,13 +74,13 @@ export const createTweetValidator = validate(
 
             if (type === TweetType.Retweet) {
               if (!isEmpty(value)) {
-                throw new Error(TWEET_MESSAGES.CONTENT_MUST_BE_EMPTY)
+                throw new ErrorWithStatus(TWEET_MESSAGES.CONTENT_MUST_BE_EMPTY, HTTP_STATUS.BAD_REQUEST)
               }
               return true
             } else {
               // neu type la con lai ma khong co hagtag hay mention thi conent phai !rong
               if (isEmpty(mentions) && isEmpty(hashtags) && isEmpty(value)) {
-                throw new Error(TWEET_MESSAGES.CONTENT_REQUIRED)
+                throw new ErrorWithStatus(TWEET_MESSAGES.CONTENT_REQUIRED, HTTP_STATUS.BAD_REQUEST)
               }
               return true
             }
@@ -91,7 +95,7 @@ export const createTweetValidator = validate(
           options: (value) => {
             // neu co 1 phan tu khong phai la string thi bao loi
             if (value.some((item: any) => typeof item !== 'string')) {
-              throw new Error(TWEET_MESSAGES.HASHTAGS_MUST_BE_ARRAY_OF_STRINGS)
+              throw new ErrorWithStatus(TWEET_MESSAGES.HASHTAGS_MUST_BE_ARRAY_OF_STRINGS, HTTP_STATUS.BAD_REQUEST)
             }
             return true
           }
@@ -108,7 +112,7 @@ export const createTweetValidator = validate(
             if (
               value.some((item: any) => !ObjectId.isValid(item) || databaseService.users.indexExists(item) === null)
             ) {
-              throw new Error(TWEET_MESSAGES.MENTIONS_MUST_BE_ARRAY_OF_USER_IDS)
+              throw new ErrorWithStatus(TWEET_MESSAGES.MENTIONS_MUST_BE_ARRAY_OF_USER_IDS, HTTP_STATUS.BAD_REQUEST)
             }
             return true
           }
@@ -122,7 +126,7 @@ export const createTweetValidator = validate(
           options: (value) => {
             // neu co 1 phan tu khong phai la Media thi bao loi
             if (value.some((item: any) => !(item instanceof Media))) {
-              throw new Error(TWEET_MESSAGES.MEDIAS_MUST_BE_ARRAY_OF_MEDIAS)
+              throw new ErrorWithStatus(TWEET_MESSAGES.MEDIAS_MUST_BE_ARRAY_OF_MEDIAS, HTTP_STATUS.BAD_REQUEST)
             }
             return true
           }
@@ -132,3 +136,27 @@ export const createTweetValidator = validate(
     ['body']
   )
 )
+// check privacy
+// neu là circle thi kiem tra
+// kiem tra tai khoan cua nguoi tao co bi khoa hay kh
+export const checkPrivacyValidator = wrapRequestHandler(async (req: Request, res: Response, next: NextFunction) => {
+  const { userId } = req.decode_access_token as TokenPayload
+  const { tweetId } = req.params
+  const tweet = await tweetService.getTweetById(tweetId)
+  if (!tweet) {
+    throw new ErrorWithStatus(TWEET_MESSAGES.TWEET_NOT_FOUND, HTTP_STATUS.NOT_FOUND)
+  } else if (tweet.audience === TweetAudience.TwitterCircle) {
+    //author validate
+    const author = await userService.getUserById(tweet.user_id.toString())
+    if (!author || author?.verify === UserVerifyStatus.Banned) {
+      throw new ErrorWithStatus(TWEET_MESSAGES.AUTHOR_HAS_BEEN_BANNED, HTTP_STATUS.BAD_REQUEST)
+    }
+    // kiem tra nguoi truy cap co nam trong vong hoac la tac gia hay kh
+    const isInTwitterCircle = author.twitter_circle.some((id: ObjectId) => id.equals(userId))
+    if (!isInTwitterCircle && !author._id.equals(userId)) {
+      throw new ErrorWithStatus(POST_MESSAGES.FORBIDDEN, HTTP_STATUS.FORBIDDEN)
+    }
+    next()
+  }
+  next()
+})

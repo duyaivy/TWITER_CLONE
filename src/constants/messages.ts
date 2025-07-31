@@ -89,5 +89,7 @@ export enum TWEET_MESSAGES {
   CREATE_NEW_BOOKMARK_SUCCESS = 'Create new bookmark success',
   UN_BOOKMARK_SUCCESS = 'Un-bookmark success',
   TWEET_NOT_FOUND = 'Tweet not found',
-  INVALID_TWEET_ID = 'Invalid tweet ID'
+  INVALID_TWEET_ID = 'Invalid tweet ID',
+  GET_TWEET_SUCCESS = 'Get tweet success',
+  AUTHOR_HAS_BEEN_BANNED = 'Author has been banned'
 }
