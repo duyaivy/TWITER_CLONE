@@ -4,7 +4,7 @@ type FollowerType = {
   _id?: ObjectId
   user_id: ObjectId
   followed_user_id: ObjectId
-  created_at: Date
+  created_at?: Date
 }
 export default class Follower {
   _id?: ObjectId

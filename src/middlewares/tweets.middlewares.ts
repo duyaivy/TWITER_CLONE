@@ -168,6 +168,7 @@ export const getTweetChildrenValidator = validate(
   checkSchema(
     {
       type: {
+        optional: true,
         isIn: {
           options: [tweetType],
           errorMessage: TWEET_MESSAGES.TYPE_INVALID

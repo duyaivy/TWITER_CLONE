@@ -20,6 +20,7 @@ export const getTweetController = async (req: Request<TweetParams, any, TweetReq
   const tweet = req.tweet as Tweet
   const { user_id } = (req.decode_access_token as TokenPayload) || {}
   const resultView = await tweetService.increaseView(tweet._id as ObjectId, user_id)
+
   return res.json({
     message: TWEET_MESSAGES.GET_TWEET_SUCCESS,
     data: {
@@ -48,7 +49,7 @@ export const unlikeTweetController = async (req: Request<TweetParams>, res: Resp
   })
 }
 export const getTweetChildrenController = async (req: Request<TweetParams, any, any, TweetQuery>, res: Response) => {
-  const type = Number(req.query.type) as TweetType
+  const type = (Number(req.query.type) as TweetType) || undefined
   const limit = Number(req.query.limit)
   const page = Number(req.query.page)
   const tweetId = req.params.tweet_id

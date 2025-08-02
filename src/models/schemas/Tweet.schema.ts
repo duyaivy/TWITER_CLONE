@@ -6,7 +6,7 @@ interface TweetInterface {
   _id?: ObjectId
   user_id: string
   content: string
-  parent_id?: string
+  parent_id: string | null
   created_at?: Date
   updated_at?: Date
   mentions: ObjectId[]
@@ -21,7 +21,7 @@ export default class Tweet {
   _id?: ObjectId
   user_id: ObjectId
   content: string
-  parent_id?: ObjectId | null
+  parent_id: ObjectId | null
   created_at?: Date
   updated_at?: Date
   mentions: ObjectId[]
