@@ -164,3 +164,46 @@ export const checkPrivacyValidator = wrapRequestHandler(async (req: Request, res
   }
   next()
 })
+export const getTweetChildrenValidator = validate(
+  checkSchema(
+    {
+      type: {
+        isIn: {
+          options: [tweetType],
+          errorMessage: TWEET_MESSAGES.TYPE_INVALID
+        }
+      }
+    },
+    ['query']
+  )
+)
+export const paginationValidator = validate(
+  checkSchema({
+    page: {
+      isNumeric: {
+        errorMessage: POST_MESSAGES.VALUES_MUST_BE_NUMBER
+      },
+      custom: {
+        options: async (value) => {
+          if (value < 1) {
+            throw new ErrorWithStatus(POST_MESSAGES.PAGE_MUST_BE_GREATER_THAN_ZERO, HTTP_STATUS.BAD_REQUEST)
+          }
+          return true
+        }
+      }
+    },
+    limit: {
+      isNumeric: {
+        errorMessage: POST_MESSAGES.VALUES_MUST_BE_NUMBER
+      },
+      custom: {
+        options: async (value) => {
+          if (value < 1 || value > 100) {
+            throw new ErrorWithStatus(POST_MESSAGES.LIMIT_MUST_BE_BETWEEN_1_AND_100, HTTP_STATUS.BAD_REQUEST)
+          }
+          return true
+        }
+      }
+    }
+  })
+)

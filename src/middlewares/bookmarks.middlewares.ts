@@ -16,8 +16,8 @@ export const tweetIdValidator = validate(
           errorMessage: TWEET_MESSAGES.TWEET_ID_REQUIRED
         },
         custom: {
-          options: async (value, { req }) => {
-            const valueDb = await tweetService.getTweetById(value)
+          options: (value, { req }) => {
+            const valueDb = tweetService.getTweetDetailById(value)
             if (!valueDb) {
               throw new ErrorWithStatus(TWEET_MESSAGES.TWEET_NOT_FOUND, HTTP_STATUS.NOT_FOUND)
             }

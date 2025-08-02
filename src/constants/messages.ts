@@ -59,7 +59,10 @@ export enum POST_MESSAGES {
   NOT_FOLLOWING = 'You are not following this user',
   GOOGLE_OAUTH_ERROR = 'Google OAuth error, please try again later',
   EMAIL_NOT_VERIFIED = 'Email not verified, please verify your email first',
-  USER_NOT_FOUND_OR_TOKEN_INVALID = 'User not found or token invalid'
+  USER_NOT_FOUND_OR_TOKEN_INVALID = 'User not found or token invalid',
+  PAGE_MUST_BE_GREATER_THAN_ZERO = 'Page must be greater than zero',
+  VALUES_MUST_BE_NUMBER = 'The values must be a number',
+  LIMIT_MUST_BE_BETWEEN_1_AND_100 = 'Limit must be between 1 and 100'
 }
 
 export enum MEDIA_MESSAGES {

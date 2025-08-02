@@ -1,12 +1,18 @@
 import { Router } from 'express'
 import {
   createTweetController,
+  getTweetChildrenController,
   getTweetController,
   likeTweetController,
   unlikeTweetController
 } from '~/controllers/tweets.controller'
 import { tweetIdValidator } from '~/middlewares/bookmarks.middlewares'
-import { checkPrivacyValidator, createTweetValidator } from '~/middlewares/tweets.middlewares'
+import {
+  checkPrivacyValidator,
+  createTweetValidator,
+  getTweetChildrenValidator,
+  paginationValidator
+} from '~/middlewares/tweets.middlewares'
 import { accessTokenValidator, isLoggedInValidator, userVerifyValidator } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handler'
 
@@ -40,6 +46,24 @@ tweetsRouter.get(
   checkPrivacyValidator,
   wrapRequestHandler(getTweetController)
 )
+
+/* path: tweets/:tweet_id/childrens
+ * Method: GET
+ * authorization:? Bearer <token>
+ * query: { page, limit, type}
+ * Description: get tweet childrens
+ */
+
+tweetsRouter.get(
+  '/:tweet_id/childrens',
+  tweetIdValidator,
+  getTweetChildrenValidator,
+  paginationValidator,
+  isLoggedInValidator(accessTokenValidator),
+  isLoggedInValidator(userVerifyValidator),
+  wrapRequestHandler(getTweetChildrenController)
+)
+
 /* path: tweets/likes
  * Method: POST
  * authorization: Bearer <token>

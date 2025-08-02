@@ -9,7 +9,7 @@ interface TweetInterface {
   parent_id?: string
   created_at?: Date
   updated_at?: Date
-  mentions: string[]
+  mentions: ObjectId[]
   type: TweetType
   audience: TweetAudience
   hashtags: ObjectId[]
@@ -24,7 +24,7 @@ export default class Tweet {
   parent_id?: ObjectId | null
   created_at?: Date
   updated_at?: Date
-  mentions: string[]
+  mentions: ObjectId[]
   type: TweetType
   audience: TweetAudience
   hashtags: ObjectId[]

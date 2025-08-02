@@ -1,6 +1,8 @@
 import { TweetAudience, TweetType } from '~/constants/enum'
 import Media from '../schemas/File.schema'
 
+import { ParamsDictionary } from 'express-serve-static-core'
+import { PaginationQuery } from './others.request'
 export interface TweetRequest {
   user_id: string
   content: string
@@ -10,4 +12,10 @@ export interface TweetRequest {
   audience: TweetAudience
   hashtags: string[]
   medias: Media[]
+}
+export interface TweetQuery extends PaginationQuery {
+  type: string
+}
+export interface TweetParams extends ParamsDictionary {
+  tweet_id: string
 }
