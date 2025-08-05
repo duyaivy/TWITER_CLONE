@@ -151,7 +151,7 @@ export const getProfileController = (req: Request<ParamsDictionary, any, {}>, re
 export const followUserController = async (req: Request<ParamsDictionary, FollowUserRequest>, res: Response) => {
   const userId = req.decode_access_token?.userId
   const followedUserId = req.body.followed_user_id
-  const result = await userService.followUser(userId as string, followedUserId)
+  const result = await userService.followUser(followedUserId, userId as string)
   return res.json(result)
 }
 export const unfollowUserController = async (req: Request<ParamsDictionary, FollowUserRequest>, res: Response) => {

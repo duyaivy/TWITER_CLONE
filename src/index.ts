@@ -6,6 +6,8 @@ import cors from 'cors'
 import { initialUploadFolder } from './utils/file'
 import ENV from './constants/config'
 import mediasRouter from './routes/medias.routes'
+import tweetsRouter from './routes/tweets.routes'
+import bookmarkRouter from './routes/bookmarks.routes'
 
 const app = express()
 const port = ENV.SERVER_PORT
@@ -23,7 +25,8 @@ app.use(cors())
 
 app.use('/users', usersRouter)
 app.use('/medias', mediasRouter)
-
+app.use('/tweets', tweetsRouter)
+app.use('/bookmarks', bookmarkRouter)
 // handle errors globally
 app.use(defaultErrorHandler)
 app.listen(port, () => {

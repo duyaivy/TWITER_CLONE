@@ -124,6 +124,9 @@ class UserService {
   getUserByEmail(email: string) {
     return databaseService.users.findOne({ email })
   }
+  getUserById(userId: string) {
+    return databaseService.users.findOne({ _id: new ObjectId(userId) })
+  }
   async login(user: User) {
     const [access_token, refresh_token] = await this.signAccessAndRefreshToken({
       userId: user._id?.toString() as string,
@@ -369,6 +372,7 @@ class UserService {
       user_id: new ObjectId(user_id),
       followed_user_id: new ObjectId(followed_user_id)
     })
+
     if (followerData == null) {
       const follower = new Follower({
         user_id: new ObjectId(user_id),
@@ -379,6 +383,7 @@ class UserService {
       if (!result.acknowledged) {
         throw new ErrorWithStatus(POST_MESSAGES.INTERNAL_SERVER_ERROR, HTTP_STATUS.INTERNAL_SERVER_ERROR)
       }
+
       return {
         message: POST_MESSAGES.FOLLOW_USER_SUCCESS
       }

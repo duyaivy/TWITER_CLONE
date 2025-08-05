@@ -4,6 +4,9 @@ import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import ENV from '~/constants/config'
 import Follower from '~/models/schemas/Follower.schema'
 import VideoStatus from '~/models/schemas/VideoStatus.schema'
+import Tweet from '~/models/schemas/Tweet.schema'
+import Hashtag from '~/models/schemas/Hashtag.schema'
+import BookmarkOrLike from '~/models/schemas/Bookmark.schema'
 
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@duyedu.23c9stb.mongodb.net/?retryWrites=true&w=majority&appName=duyEdu`
 
@@ -80,6 +83,18 @@ class DBService {
   }
   get videoStatuses(): Collection<VideoStatus> {
     return this.db.collection(ENV.DB_VIDEO_STATUS_COLLECTION)
+  }
+  get tweets(): Collection<Tweet> {
+    return this.db.collection(ENV.DB_TWEET_COLLECTION)
+  }
+  get hashtags(): Collection<Hashtag> {
+    return this.db.collection(ENV.DB_HASHTAG_COLLECTION)
+  }
+  get bookmarks(): Collection<BookmarkOrLike> {
+    return this.db.collection(ENV.DB_BOOKMARK_COLLECTION)
+  }
+  get likes(): Collection<BookmarkOrLike> {
+    return this.db.collection(ENV.DB_LIKE_COLLECTION)
   }
 }
 

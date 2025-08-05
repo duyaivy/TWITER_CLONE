@@ -7,6 +7,7 @@ interface UserType {
   email: string
   date_of_birth?: Date
   password: string
+  twitter_circle?: string[]
   created_at?: Date
   updated_at?: Date
   email_verify_token?: string
@@ -31,6 +32,7 @@ export default class User {
   forgot_password_token: string
   verify: UserVerifyStatus
   bio: string
+  twitter_circle: ObjectId[]
   location: string
   website: string
   username: string
@@ -49,6 +51,7 @@ export default class User {
     this.email_verify_token = user.email_verify_token || ''
     this.forgot_password_token = user.forgot_password_token || ''
     this.verify = user.verify || UserVerifyStatus.Unverified
+    this.twitter_circle = user.twitter_circle ? user.twitter_circle?.map((id) => new ObjectId(id)) : []
     this.bio = user.bio || ''
     this.location = user.location || ''
     this.website = user.website || ''
