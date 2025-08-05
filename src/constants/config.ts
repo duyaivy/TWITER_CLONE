@@ -51,3 +51,7 @@ export const CONFIG = {
   CHUNK_SIZE: 10 ** 6 //1mb
 }
 export const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime']
+export const DEFAULT_VALUE = {
+  LIMIT: 20,
+  PAGE: 1
+}

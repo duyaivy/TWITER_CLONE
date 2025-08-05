@@ -5,6 +5,17 @@ import Hashtag from '~/models/schemas/Hashtag.schema'
 import { ObjectId } from 'mongodb'
 import BookmarkOrLike from '~/models/schemas/Bookmark.schema'
 import { TweetType } from '~/constants/enum'
+import {
+  addSimulatedViews,
+  joinBookmarksAndLikes,
+  joinChildTweets,
+  joinHashtags,
+  joinMentions,
+  joinUsers,
+  pagination,
+  sortByCreatedAtDesc,
+  sortTwitterCircle
+} from '~/utils/aggregate'
 
 class TweetService {
   async checkAndCreateHashtag(hashtags: string[]) {
@@ -56,140 +67,14 @@ class TweetService {
             _id: new ObjectId(id)
           }
         },
-        {
-          // join hashtags
-          $lookup: {
-            from: 'hashtags', // noi se join
-            localField: 'hashtags', // field trong schema
-            foreignField: '_id', // noi tham chieu ben ngoai
-            as: 'hashtags' // ten truong sau khi aggregate
-          }
-        },
-        {
-          // join mentions -> lay ra toan bo user duoc mention
-          $lookup: {
-            from: 'users', // noi se join
-            localField: 'mentions', // field trong schema
-            foreignField: '_id', // noi tham chieu ben ngoai
-            as: 'mentions' // ten truong sau khi aggregate
-          }
-        },
-        {
-          // them truong, ghi de len gia tri mentions
-          $addFields: {
-            mentions: {
-              $map: {
-                input: '$mentions', // ten truong o schema
-                as: 'mt', // ten gia tri lay ra,
-                in: {
-                  _id: '$$mt._id',
-                  name: '$$mt.name',
-                  username: '$$mt.username',
-                  avatar: '$$mt.avatar',
-                  email: '$$mt.email',
-                  location: '$$mt.location'
-                }
-              }
-            }
-          }
-        },
-        {
-          // lay user ra author
-          $lookup: {
-            from: 'users',
-            localField: 'user_id',
-            foreignField: '_id',
-            as: 'user_id'
-          }
-        },
-        {
-          $unwind: {
-            path: '$user_id',
-            preserveNullAndEmptyArrays: true // neu khong co user_id thi van tra ve tweet
-          }
-        },
-        {
-          $addFields: {
-            author: {
-              _id: '$user_id._id',
-              name: '$user_id.name',
-              email: '$user_id.email',
-              avatar: '$user_id.avatar'
-            }
-          }
-        },
-        {
-          $lookup: {
-            from: 'bookmarks',
-            localField: '_id',
-            foreignField: 'tweet_id',
-            as: 'bookmarks'
-          }
-        },
-        {
-          $lookup: {
-            from: 'likes',
-            localField: '_id',
-            foreignField: 'tweet_id',
-            as: 'likes'
-          }
-        },
-        {
-          // lay gia tri cua retweet, comment, quoteTweet
-          $lookup: {
-            from: 'tweets',
-            localField: '_id',
-            foreignField: 'parent_id',
-            as: 'children_tweets'
-          }
-        },
-        {
-          $addFields: {
-            bookmarks: {
-              $size: '$bookmarks' // ten truong trong schema
-            },
-            likes: {
-              $size: '$likes' // ten truong trong schema
-            },
-            retweets: {
-              $size: {
-                $filter: {
-                  input: '$children_tweets',
-                  as: 'tweet',
-                  cond: {
-                    $eq: ['$$tweet.type', TweetType.Retweet]
-                  }
-                }
-              }
-            },
-            comments: {
-              $size: {
-                $filter: {
-                  input: '$children_tweets',
-                  as: 'tweet',
-                  cond: {
-                    $eq: ['$$tweet.type', TweetType.Comment]
-                  }
-                }
-              }
-            },
-            quotes: {
-              $size: {
-                $filter: {
-                  input: '$children_tweets',
-                  as: 'tweet',
-                  cond: {
-                    $eq: ['$$tweet.type', TweetType.QuoteTweet]
-                  }
-                }
-              }
-            }
-          } // loai bo truong khong can thiet
-        },
+        joinHashtags,
+        ...joinMentions,
+        ...joinUsers,
+        ...joinBookmarksAndLikes,
+        ...joinChildTweets,
         {
           $project: {
-            user_id: 0,
-            children_tweets: 0
+            user_id: 0
           }
         }
       ])
@@ -259,147 +144,16 @@ class TweetService {
         {
           $match: matchCondition
         },
-        {
-          // join hashtags
-          $lookup: {
-            from: 'hashtags', // noi se join
-            localField: 'hashtags', // field trong schema
-            foreignField: '_id', // noi tham chieu ben ngoai
-            as: 'hashtags' // ten truong sau khi aggregate
-          }
-        },
-        {
-          // join mentions -> lay ra toan bo user duoc mention
-          $lookup: {
-            from: 'users', // noi se join
-            localField: 'mentions', // field trong schema
-            foreignField: '_id', // noi tham chieu ben ngoai
-            as: 'mentions' // ten truong sau khi aggregate
-          }
-        },
-        {
-          // them truong, ghi de len gia tri mentions
-          $addFields: {
-            mentions: {
-              $map: {
-                input: '$mentions', // ten truong o schema
-                as: 'mt', // ten gia tri lay ra,
-                in: {
-                  _id: '$$mt._id',
-                  name: '$$mt.name',
-                  username: '$$mt.username',
-                  avatar: '$$mt.avatar',
-                  email: '$$mt.email',
-                  location: '$$mt.location'
-                }
-              }
-            }
-          }
-        },
-        {
-          // lay user ra author
-          $lookup: {
-            from: 'users',
-            localField: 'user_id',
-            foreignField: '_id',
-            as: 'user_id'
-          }
-        },
-        {
-          $unwind: {
-            path: '$user_id',
-            preserveNullAndEmptyArrays: true // neu khong co user_id thi van tra ve tweet
-          }
-        },
-        {
-          $addFields: {
-            author: {
-              _id: '$user_id._id',
-              name: '$user_id.name',
-              email: '$user_id.email',
-              avatar: '$user_id.avatar'
-            }
-          }
-        },
-        {
-          $lookup: {
-            from: 'bookmarks',
-            localField: '_id',
-            foreignField: 'tweet_id',
-            as: 'bookmarks'
-          }
-        },
-        {
-          $lookup: {
-            from: 'likes',
-            localField: '_id',
-            foreignField: 'tweet_id',
-            as: 'likes'
-          }
-        },
-        {
-          // lay gia tri cua retweet, comment, quoteTweet
-          $lookup: {
-            from: 'tweets',
-            localField: '_id',
-            foreignField: 'parent_id',
-            as: 'children_tweets'
-          }
-        },
-        {
-          $addFields: {
-            bookmarks: {
-              $size: '$bookmarks' // ten truong trong schema
-            },
-            likes: {
-              $size: '$likes' // ten truong trong schema
-            },
-            retweets: {
-              $size: {
-                $filter: {
-                  input: '$children_tweets',
-                  as: 'tweet',
-                  cond: {
-                    $eq: ['$$tweet.type', TweetType.Retweet]
-                  }
-                }
-              }
-            },
-            comments: {
-              $size: {
-                $filter: {
-                  input: '$children_tweets',
-                  as: 'tweet',
-                  cond: {
-                    $eq: ['$$tweet.type', TweetType.Comment]
-                  }
-                }
-              }
-            },
-            quotes: {
-              $size: {
-                $filter: {
-                  input: '$children_tweets',
-                  as: 'tweet',
-                  cond: {
-                    $eq: ['$$tweet.type', TweetType.QuoteTweet]
-                  }
-                }
-              }
-            }
-          } // loai bo truong khong can thiet
-        },
+        ...pagination(page, limit),
+        joinHashtags,
+        ...joinMentions,
+        ...joinUsers,
+        ...joinBookmarksAndLikes,
+        ...joinChildTweets,
         {
           $project: {
-            user_id: 0,
-            children_tweets: 0
+            user_id: 0
           }
-        },
-        {
-          $skip: limit * (page - 1) // skip qua cac schema
-        },
-        {
-          $limit: limit
         }
       ])
       .toArray()
@@ -411,6 +165,96 @@ class TweetService {
       },
       data: tweets
     }
+  }
+
+  // new feeds
+  async getNewFeeds({ userId, limit, page }: { userId?: string; limit: number; page: number }) {
+    const userObjectId = new ObjectId(userId)
+    // lay followers cua nguoi goi API
+    const followers = await databaseService.followers
+      .find(
+        {
+          user_id: userObjectId
+        },
+        {
+          projection: {
+            _id: 0,
+            followed_user_id: 1
+          }
+        }
+      )
+      .toArray()
+
+    // lay ra nhung nguoi toi da follow
+    const followersUserIds = followers.map((f) => f.followed_user_id)
+    // dieu kien match la tweet cua nguoi do hoac tweet cua nguoi da follow
+    const matchCondition = {
+      user_id: { $in: [userObjectId, ...followersUserIds] }
+    }
+
+    // lay so luong total documents
+    type TweetsWithTotal = {
+      tweets: Tweet[]
+      totalDocument: { total: number }[]
+    }
+    // get Tweets
+    const [{ tweets, totalDocument }] = await databaseService.tweets
+      .aggregate<TweetsWithTotal>([
+        {
+          $match: matchCondition
+        },
+        {
+          $facet: {
+            tweets: [
+              sortByCreatedAtDesc,
+              ...pagination(page, limit),
+              ...joinUsers,
+              sortTwitterCircle(userId ? new ObjectId(userId) : new ObjectId()),
+              joinHashtags,
+              ...joinMentions,
+              ...joinBookmarksAndLikes,
+              ...joinChildTweets,
+              addSimulatedViews(userObjectId), // tang view gia
+              {
+                $project: {
+                  user_id: 0,
+                  simulated_views: 0
+                }
+              }
+            ],
+            totalDocument: [{ $count: 'total' }]
+          }
+        }
+      ])
+      .toArray()
+
+    //  await databaseService.tweets.countDocuments(matchCondition)
+    const total = Math.ceil(totalDocument[0]?.total / limit)
+    const tweetIds = tweets.map((tweet: Tweet) => tweet._id as ObjectId)
+
+    // cap nhat views cho cac tweet da lay ve
+    await this.updateTweetViews(tweetIds, userId)
+    // chi tang views cho nhung tweet thuc su duoc tra ve
+
+    return {
+      control: {
+        total,
+        page,
+        limit
+      },
+      data: tweets
+    }
+  }
+  async updateTweetViews(tweetIds: ObjectId[], userId?: string) {
+    const updateView = userId ? { user_views: 1 } : { guest_views: 1 }
+    const result = await databaseService.tweets.updateMany(
+      { _id: { $in: tweetIds } },
+      {
+        $inc: updateView,
+        $set: { updated_at: new Date() }
+      }
+    )
+    return result
   }
 }
 const tweetService = new TweetService()

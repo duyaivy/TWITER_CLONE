@@ -78,7 +78,7 @@ export enum MEDIA_MESSAGES {
   VIDEO_UPLOAD_PROCESSING = 'Video upload processing'
 }
 export enum TWEET_MESSAGES {
-  TYPE_INVALID = 'Invalid tweet type',
+  TYPE_INVALID = 'Invalid object type',
   AUDIENCE_INVALID = 'Invalid tweet audience',
   CONTENT_REQUIRED = 'Tweet content is required',
   PARENT_ID_REQUIRED_OR_NOT_FOUND = 'Parent tweet ID is required or not found',
@@ -98,5 +98,6 @@ export enum TWEET_MESSAGES {
   AUTHOR_HAS_BEEN_BANNED = 'Author has been banned',
   TWEET_IS_NOT_PUBLIC = 'Tweet is not public',
   LIKE_TWEET_SUCCESS = 'Like tweet success',
-  UNLIKE_TWEET_SUCCESS = 'Unlike tweet success'
+  UNLIKE_TWEET_SUCCESS = 'Unlike tweet success',
+  GET_NEW_FEEDS_SUCCESS = 'Get new feeds success'
 }

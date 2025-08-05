@@ -34,9 +34,10 @@ export const createTweetValidator = validate(
         }
       },
       parent_id: {
-        isMongoId: {
-          errorMessage: TWEET_MESSAGES.TYPE_INVALID
-        },
+        optional: true,
+        // isMongoId: {
+        //   errorMessage: TWEET_MESSAGES.TYPE_INVALID
+        // },
         custom: {
           options: async (value, { req }) => {
             const type = req.body.type
@@ -47,7 +48,10 @@ export const createTweetValidator = validate(
               }
               return true
             } else {
-              // neu la reply thi phai co parent_id
+              // neu la con lai thi phai co parent_id
+              if (!ObjectId.isValid(value)) {
+                throw new ErrorWithStatus(TWEET_MESSAGES.TYPE_INVALID, HTTP_STATUS.BAD_REQUEST)
+              }
               const tweetExist = await tweetService.getTweetById(value)
               if (!tweetExist) {
                 throw new ErrorWithStatus(TWEET_MESSAGES.PARENT_ID_REQUIRED_OR_NOT_FOUND, HTTP_STATUS.NOT_FOUND)

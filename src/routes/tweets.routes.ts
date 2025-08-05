@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import {
   createTweetController,
+  getNewFeedController,
   getTweetChildrenController,
   getTweetController,
   likeTweetController,
@@ -89,6 +90,19 @@ tweetsRouter.delete(
   accessTokenValidator,
   userVerifyValidator,
   wrapRequestHandler(unlikeTweetController)
+)
+/* path: tweets
+ * Method: GET
+ * authorization: Bearer <token>
+ * Description: Get new feeds
+ * query: { page, limit }
+ */
+tweetsRouter.get(
+  '/',
+  paginationValidator,
+  isLoggedInValidator(accessTokenValidator),
+  isLoggedInValidator(userVerifyValidator),
+  wrapRequestHandler(getNewFeedController)
 )
 
 export default tweetsRouter

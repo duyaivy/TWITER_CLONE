@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { ObjectId } from 'mongodb'
+import { DEFAULT_VALUE } from '~/constants/config'
 import { TweetType } from '~/constants/enum'
 import { TWEET_MESSAGES } from '~/constants/messages'
 import { TweetParams, TweetQuery, TweetRequest } from '~/models/requests/Tweet.request'
@@ -50,8 +51,8 @@ export const unlikeTweetController = async (req: Request<TweetParams>, res: Resp
 }
 export const getTweetChildrenController = async (req: Request<TweetParams, any, any, TweetQuery>, res: Response) => {
   const type = (Number(req.query.type) as TweetType) || undefined
-  const limit = Number(req.query.limit)
-  const page = Number(req.query.page)
+  const limit = Number(req.query.limit) || DEFAULT_VALUE.LIMIT // default limit
+  const page = Number(req.query.page) || DEFAULT_VALUE.PAGE // default page
   const tweetId = req.params.tweet_id
   const { userId } = (req.decode_access_token as TokenPayload) || {}
 
@@ -64,6 +65,22 @@ export const getTweetChildrenController = async (req: Request<TweetParams, any, 
   })
   return res.json({
     message: TWEET_MESSAGES.UNLIKE_TWEET_SUCCESS,
+    data
+  })
+}
+
+export const getNewFeedController = async (req: Request<TweetParams, any, any, TweetQuery>, res: Response) => {
+  const limit = Number(req.query.limit) || DEFAULT_VALUE.LIMIT // default limit
+  const page = Number(req.query.page) || DEFAULT_VALUE.PAGE // default page
+  const { userId } = (req.decode_access_token as TokenPayload) || {}
+
+  const data = await tweetService.getNewFeeds({
+    userId,
+    limit,
+    page
+  })
+  return res.json({
+    message: TWEET_MESSAGES.GET_NEW_FEEDS_SUCCESS,
     data
   })
 }
