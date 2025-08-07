@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { checkSchema } from 'express-validator'
 import { isEmpty } from 'lodash'
 import { ObjectId } from 'mongodb'
-import { TweetAudience, TweetType, UserVerifyStatus } from '~/constants/enum'
+import { MediaQueryType, TweetAudience, TweetType, UserVerifyStatus } from '~/constants/enum'
 import { HTTP_STATUS } from '~/constants/httpStatus'
 import { POST_MESSAGES, TWEET_MESSAGES, USER_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Errors'
@@ -11,13 +11,13 @@ import databaseService from '~/services/database.services'
 import tweetService from '~/services/tweet.services'
 import userService from '~/services/user.services'
 import { TokenPayload } from '~/type'
-import { numberEnumToArray } from '~/utils/commons'
+import { numberEnumToArray, stringEnumToArray } from '~/utils/commons'
 import { wrapRequestHandler } from '~/utils/handler'
 import { validate } from '~/utils/validation'
 
 const tweetType = numberEnumToArray(TweetType)
 const tweetAudience = numberEnumToArray(TweetAudience)
-
+const mediaType = stringEnumToArray(MediaQueryType)
 export const createTweetValidator = validate(
   checkSchema(
     {
@@ -182,9 +182,30 @@ export const getTweetChildrenValidator = validate(
     ['query']
   )
 )
+export const searchTweetsValidator = validate(
+  checkSchema(
+    {
+      media_type: {
+        optional: true,
+        isIn: {
+          options: [mediaType],
+          errorMessage: TWEET_MESSAGES.TYPE_INVALID
+        }
+      },
+      people_follow: {
+        optional: true,
+        isBoolean: {
+          errorMessage: TWEET_MESSAGES.PEOPLE_FOLLOW_MUST_BE_BOOLEAN
+        }
+      }
+    },
+    ['query']
+  )
+)
 export const paginationValidator = validate(
   checkSchema({
     page: {
+      optional: true,
       isNumeric: {
         errorMessage: POST_MESSAGES.VALUES_MUST_BE_NUMBER
       },
@@ -198,6 +219,7 @@ export const paginationValidator = validate(
       }
     },
     limit: {
+      optional: true,
       isNumeric: {
         errorMessage: POST_MESSAGES.VALUES_MUST_BE_NUMBER
       },
