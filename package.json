@@ -35,7 +35,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@aws-sdk/client-ses": "^3.846.0",
+    "@aws-sdk/client-ses": "^3.864.0",
     "@faker-js/faker": "^9.9.0",
     "@types/jsonwebtoken": "^9.0.10",
     "axios": "^1.10.0",

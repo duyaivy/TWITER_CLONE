@@ -101,7 +101,8 @@ export enum TWEET_MESSAGES {
   UNLIKE_TWEET_SUCCESS = 'Unlike tweet success',
   GET_NEW_FEEDS_SUCCESS = 'Get new feeds success',
   GET_TWEET_CHILDREN_SUCCESS = 'Get tweet children success',
-  PEOPLE_FOLLOW_MUST_BE_BOOLEAN = 'People follow must be a boolean'
+  PEOPLE_FOLLOW_MUST_BE_BOOLEAN = 'People follow must be a boolean',
+  CONTENT_TOO_LONG_OR_TOO_SHORT = 'Content must be between 3 and 280 characters'
 }
 export enum SEARCH_MESSAGE {
   SEARCH_SUCCESS = 'Search success'

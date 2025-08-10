@@ -4,7 +4,7 @@ import { isEmpty } from 'lodash'
 import { ObjectId } from 'mongodb'
 import { MediaQueryType, TweetAudience, TweetType, UserVerifyStatus } from '~/constants/enum'
 import { HTTP_STATUS } from '~/constants/httpStatus'
-import { POST_MESSAGES, TWEET_MESSAGES, USER_MESSAGES } from '~/constants/messages'
+import { POST_MESSAGES, TWEET_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Errors'
 import Media from '~/models/schemas/File.schema'
 import databaseService from '~/services/database.services'
@@ -196,6 +196,15 @@ export const searchTweetsValidator = validate(
         optional: true,
         isBoolean: {
           errorMessage: TWEET_MESSAGES.PEOPLE_FOLLOW_MUST_BE_BOOLEAN
+        }
+      },
+      content: {
+        isString: {
+          errorMessage: TWEET_MESSAGES.CONTENT_REQUIRED
+        },
+        isLength: {
+          options: { max: 280, min: 3 },
+          errorMessage: TWEET_MESSAGES.CONTENT_TOO_LONG_OR_TOO_SHORT
         }
       }
     },
