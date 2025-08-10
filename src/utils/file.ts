@@ -2,7 +2,6 @@ import { Request } from 'express'
 import formidable from 'formidable'
 import fs from 'fs'
 import { ObjectId } from 'mongodb'
-import { nanoid } from 'nanoid'
 import path from 'path'
 import { ALLOWED_VIDEO_TYPES, CONFIG } from '~/constants/config'
 import { HTTP_STATUS } from '~/constants/httpStatus'
@@ -97,4 +96,17 @@ export const getNameFromFullname = (name: string) => {
     parts.pop()
   }
   return parts.join('')
+}
+
+export const getFiles = (dir: string, files: string[] = []) => {
+  const fileList = fs.readdirSync(dir)
+  for (const file of fileList) {
+    const name = `${dir}/${file}`
+    if (fs.statSync(name).isDirectory()) {
+      getFiles(name, files)
+    } else {
+      files.push(name)
+    }
+  }
+  return files
 }

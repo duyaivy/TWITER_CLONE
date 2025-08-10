@@ -10,6 +10,7 @@ import { CONFIG } from '~/constants/config'
 import mime from 'mime'
 import { getNameFromFullname } from '~/utils/file'
 import videoStatusService from '~/services/videoStatus.services'
+import { sendFileFromS3 } from '~/utils/s3'
 
 export const uploadImageController = async (req: Request, res: Response) => {
   const result = await mediaService.uploadImage(req)
@@ -82,14 +83,8 @@ export const getVideoController = (req: Request, res: Response) => {
 }
 export const getM3u8Controller = (req: Request, res: Response) => {
   const { id } = req.params
-  const videoPath = path.resolve(PATH_UPLOAD_VIDEO, id, 'master.m3u8')
-  res.sendFile(videoPath, (err) => {
-    if (err) {
-      res.status(HTTP_STATUS.NOT_FOUND).json({
-        message: MEDIA_MESSAGES.FILE_NOT_FOUND
-      })
-    }
-  })
+  const path = `videos-hls/${id}/master.m3u8`
+  sendFileFromS3(res, path)
 }
 export const getStatusVideoHLSController = async (req: Request, res: Response) => {
   const { id } = req.params
@@ -106,12 +101,6 @@ export const getStatusVideoHLSController = async (req: Request, res: Response) =
 }
 export const getSegmentController = (req: Request, res: Response) => {
   const { id, v, segment } = req.params
-  const videoPath = path.resolve(PATH_UPLOAD_VIDEO, id, v, segment)
-  res.sendFile(videoPath, (err) => {
-    if (err) {
-      res.status(HTTP_STATUS.NOT_FOUND).json({
-        message: MEDIA_MESSAGES.FILE_NOT_FOUND
-      })
-    }
-  })
+  const path = `videos-hls/${id}/${v}/${segment}`
+  sendFileFromS3(res, path)
 }

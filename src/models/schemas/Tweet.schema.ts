@@ -49,3 +49,9 @@ export default class Tweet {
     this.user_views = tweet?.user_views || 0
   }
 }
+
+// lay so luong total documents
+export type TweetsWithTotal = {
+  tweets: Tweet[]
+  totalDocument: { total: number }[]
+}

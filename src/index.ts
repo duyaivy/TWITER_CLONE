@@ -8,7 +8,7 @@ import ENV from './constants/config'
 import mediasRouter from './routes/medias.routes'
 import tweetsRouter from './routes/tweets.routes'
 import bookmarkRouter from './routes/bookmarks.routes'
-
+import searchRouter from './routes/searchs.routes'
 const app = express()
 const port = ENV.SERVER_PORT
 
@@ -18,7 +18,12 @@ app.get('/', (req, res) => {
 })
 app.use(express.json())
 databaseService.connect().then(() => {
-  Promise.all([databaseService.indexUser(), databaseService.indexFollowers(), databaseService.indexRefreshTokens()])
+  Promise.all([
+    databaseService.indexUser(),
+    databaseService.indexFollowers(),
+    databaseService.indexRefreshTokens(),
+    databaseService.indexTweets()
+  ])
 })
 
 app.use(cors())
@@ -27,6 +32,7 @@ app.use('/users', usersRouter)
 app.use('/medias', mediasRouter)
 app.use('/tweets', tweetsRouter)
 app.use('/bookmarks', bookmarkRouter)
+app.use('/searchs', searchRouter)
 // handle errors globally
 app.use(defaultErrorHandler)
 app.listen(port, () => {

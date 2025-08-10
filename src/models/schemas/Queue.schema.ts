@@ -5,7 +5,11 @@ import { MediaStatus } from '~/constants/enum'
 import { ObjectId } from 'mongodb'
 import { ErrorWithStatus } from '../Errors'
 import { MEDIA_MESSAGES } from '~/constants/messages'
-
+import { getFiles } from '~/utils/file'
+import path from 'path'
+import { PATH_UPLOAD_VIDEO } from '~/constants/URL'
+import { uploadFileS3 } from '~/utils/s3'
+import mime from 'mime'
 interface VideoQueueItem {
   filePath: string
   fileId: string
@@ -32,7 +36,24 @@ class Queue {
         if (currentFile) {
           try {
             await encodeHLSWithMultipleVideoStreams(currentFile.filePath)
-            await fs.promises.unlink(currentFile.filePath) // Xóa file sau khi đã mã hóa
+            const folderVideo = path.resolve(PATH_UPLOAD_VIDEO, currentFile.fileId)
+            // delete
+            await fs.promises.unlink(currentFile.filePath)
+            // upload to s3
+            const files = getFiles(path.resolve(PATH_UPLOAD_VIDEO, currentFile.fileId))
+            await Promise.all(
+              files.map((filepath) => {
+                const relativePath = path.relative(PATH_UPLOAD_VIDEO, filepath)
+                const s3Key = 'videos-hls/' + relativePath.split(path.sep).join('/')
+
+                return uploadFileS3({
+                  filepath,
+                  filename: s3Key,
+                  contentType: mime.getType(filepath) as string
+                })
+              })
+            )
+
             await videoStatusService
               .updateVideoStatus(
                 new ObjectId(currentFile.fileId),
@@ -42,6 +63,8 @@ class Queue {
               .catch((error) => {
                 console.log(`Failed to update video status: ${error.message}`)
               })
+
+            await fs.promises.rmdir(folderVideo, { recursive: true })
             console.log(`Encoded and removed file: ${currentFile.filePath} successfully`)
           } catch (error) {
             console.error('Error encoding video:', error)

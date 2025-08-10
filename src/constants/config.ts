@@ -37,7 +37,8 @@ const ENV = {
   TOKEN_URI: (process.env.TOKEN_URI as string) || 'https://oauth2.googleapis.com/token',
   CLIENT_REDIRECT_URI: (process.env.CLIENT_REDIRECT_URI as string) || '',
   SERVER_PORT: (process.env.SERVER_PORT as string) || '3000',
-  HOST: process.env.HOST as string
+  HOST: process.env.HOST as string,
+  AWS_BUCKET_NAME: (process.env.AWS_BUCKET_NAME as string) || ''
 } as const
 
 export default ENV

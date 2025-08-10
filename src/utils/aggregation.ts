@@ -1,5 +1,8 @@
 import { ObjectId } from 'mongodb'
 import { TweetType } from '~/constants/enum'
+import Tweet, { TweetsWithTotal } from '~/models/schemas/Tweet.schema'
+import databaseService from '~/services/database.services'
+import tweetService from '~/services/tweet.services'
 
 export const joinMentions = [
   {
@@ -155,15 +158,22 @@ export const pagination = (page: number, limit: number) => {
     }
   ]
 }
-export const addSimulatedViews = (userId?: ObjectId) => {
+export const addSimulatedViews = (isLoggedIn: boolean) => {
   return {
     $addFields: {
-      simulated_views: {
-        $cond: [
-          { $ifNull: [userId, false] }, // dieu kien
-          { $add: ['$user_views', 1] }, // them vao user_views
-          { $add: ['$guest_views', 1] } // → ngược lại, them vao guest_views
-        ]
+      user_views: {
+        $cond: {
+          if: { $eq: [isLoggedIn, true] }, // neu da dang nhap
+          then: { $add: ['$user_views', 1] }, // lay gia tri user_views
+          else: '$user_views' // neu chua dang nhap thi tang view len 1
+        }
+      },
+      guest_views: {
+        $cond: {
+          if: { $eq: [isLoggedIn, false] }, // neu da dang nhap
+          then: { $add: ['$guest_views', 1] }, // lay gia tri guest_views
+          else: '$guest_views' // neu chua dang nhap thi tang view len 1
+        }
       }
     }
   }
@@ -195,5 +205,57 @@ export const sortTwitterCircle = (userId: ObjectId) => {
 export const sortByCreatedAtDesc = {
   $sort: {
     create_at: -1
+  }
+}
+
+export const aggregateTweetsWithPagination = async (
+  matchCondition: any,
+  page: number,
+  limit: number,
+  userId?: string,
+  isSortTwitterCircle: boolean = false
+) => {
+  const [{ tweets, totalDocument }] = await databaseService.tweets
+    .aggregate<TweetsWithTotal>([
+      {
+        $match: matchCondition
+      },
+      {
+        $facet: {
+          tweets: [
+            sortByCreatedAtDesc,
+            ...pagination(page, limit),
+            ...joinUsers,
+            ...(isSortTwitterCircle ? [sortTwitterCircle(userId ? new ObjectId(userId) : new ObjectId())] : []),
+            joinHashtags,
+            ...joinMentions,
+            ...joinBookmarksAndLikes,
+            ...joinChildTweets,
+            addSimulatedViews(Boolean(userId)),
+            // tang view gia
+            {
+              $project: {
+                user_id: 0,
+                simulated_views: 0
+              }
+            }
+          ],
+          totalDocument: [{ $count: 'total' }]
+        }
+      }
+    ])
+    .toArray()
+
+  const total = Math.ceil(totalDocument[0]?.total / limit)
+  const tweetIds = tweets.map((tweet: Tweet) => tweet._id as ObjectId)
+  await tweetService.updateTweetViews(tweetIds, userId)
+
+  return {
+    control: {
+      total: total ? total : 0,
+      page,
+      limit
+    },
+    data: tweets
   }
 }

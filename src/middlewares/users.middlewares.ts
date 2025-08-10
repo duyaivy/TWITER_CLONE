@@ -271,8 +271,11 @@ export const emailTokenValidator = validate(
 export const emailResendValidator = validate(
   emailSchema(async (value, { req }) => {
     const user = await userService.getUserByEmail(value)
-    if (!user || user.verify === UserVerifyStatus.Verified) {
+    if (!user) {
       throw new ErrorWithStatus(POST_MESSAGES.USER_NOT_FOUND, HTTP_STATUS.NOT_FOUND)
+    }
+    if (user.verify === UserVerifyStatus.Verified) {
+      throw new ErrorWithStatus(POST_MESSAGES.EMAIL_ALREADY_VERIFIED, HTTP_STATUS.BAD_REQUEST)
     }
     req.user = user
     return true

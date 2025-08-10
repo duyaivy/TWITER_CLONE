@@ -78,10 +78,27 @@ export const sendVerifyRegisterEmail = (
     toAddress,
     'Verify your email',
     template
-      .replace('{{title}}', 'Please verify your email')
+      .replaceAll('{{title}}', 'Please verify your email from Twitter Clone')
       .replace('{{content}}', 'Click the button below to verify your email')
       .replace('{{titleLink}}', 'Verify')
       .replace('{{link}}', `${ENV.CLIENT_URL}/email-verifications?token=${email_verify_token}`)
+      .replace('{{year}}', new Date().getFullYear().toString())
+  )
+}
+export const sendForgotPasswordEmail = (
+  toAddress: string,
+  forgot_password_token: string,
+  template: string = verifyEmailTemplate
+) => {
+  return sendVerifyEmail(
+    toAddress,
+    'Reset your password',
+    template
+      .replaceAll('{{title}}', 'Reset your password from Twitter Clone')
+      .replace('{{content}}', 'Click the button below to reset your password')
+      .replace('{{titleLink}}', 'Reset Password')
+      .replace('{{link}}', `${ENV.CLIENT_URL}/reset-password?token=${forgot_password_token}`)
+      .replace('{{year}}', new Date().getFullYear().toString())
   )
 }
 // nodemailer

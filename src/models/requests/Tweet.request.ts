@@ -1,8 +1,8 @@
 import { TweetAudience, TweetType } from '~/constants/enum'
 import Media from '../schemas/File.schema'
-
 import { ParamsDictionary } from 'express-serve-static-core'
-import { PaginationQuery } from './others.request'
+import { PaginationQuery } from './Others.request'
+
 export interface TweetRequest {
   user_id?: string
   content: string
