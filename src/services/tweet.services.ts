@@ -1,4 +1,4 @@
-import Tweet from '~/models/schemas/Tweet.schema'
+import Tweet, { TweetsWithTotal } from '~/models/schemas/Tweet.schema'
 import { TweetRequest } from '~/models/requests/Tweet.request'
 import databaseService from './database.services'
 import Hashtag from '~/models/schemas/Hashtag.schema'
@@ -7,6 +7,7 @@ import BookmarkOrLike from '~/models/schemas/Bookmark.schema'
 import { TweetType } from '~/constants/enum'
 import {
   addSimulatedViews,
+  aggregateTweetsWithPagination,
   joinBookmarksAndLikes,
   joinChildTweets,
   joinHashtags,
@@ -15,7 +16,8 @@ import {
   pagination,
   sortByCreatedAtDesc,
   sortTwitterCircle
-} from '~/utils/aggregate'
+} from '~/utils/aggregation'
+import { r } from 'node_modules/@faker-js/faker/dist/airline-CLphikKp.cjs'
 
 class TweetService {
   async checkAndCreateHashtag(hashtags: string[]) {
@@ -122,49 +124,12 @@ class TweetService {
     limit: number
     page: number
   }) {
-    //  lay so luong va tang views
-    const updateView = userId ? { user_views: 1 } : { guest_views: 1 }
     const matchCondition: Record<string, any> = {
       parent_id: new ObjectId(tweetId),
       ...(type !== undefined && { type }) // chỉ thêm khi có type
     }
-    const [totalDocument] = await Promise.all([
-      // lay so luong
-      databaseService.tweets.countDocuments(matchCondition),
-      // tang views
-      databaseService.tweets.updateMany(matchCondition, {
-        $inc: updateView,
-        $set: { updated_at: new Date() }
-      })
-    ])
-    const total = Math.ceil(totalDocument / limit)
-    // get Tweets
-    const tweets = await databaseService.tweets
-      .aggregate<Tweet>([
-        {
-          $match: matchCondition
-        },
-        ...pagination(page, limit),
-        joinHashtags,
-        ...joinMentions,
-        ...joinUsers,
-        ...joinBookmarksAndLikes,
-        ...joinChildTweets,
-        {
-          $project: {
-            user_id: 0
-          }
-        }
-      ])
-      .toArray()
-    return {
-      control: {
-        total,
-        page,
-        limit
-      },
-      data: tweets
-    }
+    const result = await aggregateTweetsWithPagination(matchCondition, page, limit, userId, true)
+    return result
   }
 
   // new feeds
@@ -191,59 +156,9 @@ class TweetService {
     const matchCondition = {
       user_id: { $in: [userObjectId, ...followersUserIds] }
     }
-
-    // lay so luong total documents
-    type TweetsWithTotal = {
-      tweets: Tweet[]
-      totalDocument: { total: number }[]
-    }
     // get Tweets
-    const [{ tweets, totalDocument }] = await databaseService.tweets
-      .aggregate<TweetsWithTotal>([
-        {
-          $match: matchCondition
-        },
-        {
-          $facet: {
-            tweets: [
-              sortByCreatedAtDesc,
-              ...pagination(page, limit),
-              ...joinUsers,
-              sortTwitterCircle(userId ? new ObjectId(userId) : new ObjectId()),
-              joinHashtags,
-              ...joinMentions,
-              ...joinBookmarksAndLikes,
-              ...joinChildTweets,
-              addSimulatedViews(userObjectId), // tang view gia
-              {
-                $project: {
-                  user_id: 0,
-                  simulated_views: 0
-                }
-              }
-            ],
-            totalDocument: [{ $count: 'total' }]
-          }
-        }
-      ])
-      .toArray()
-
-    //  await databaseService.tweets.countDocuments(matchCondition)
-    const total = Math.ceil(totalDocument[0]?.total / limit)
-    const tweetIds = tweets.map((tweet: Tweet) => tweet._id as ObjectId)
-
-    // cap nhat views cho cac tweet da lay ve
-    await this.updateTweetViews(tweetIds, userId)
-    // chi tang views cho nhung tweet thuc su duoc tra ve
-
-    return {
-      control: {
-        total,
-        page,
-        limit
-      },
-      data: tweets
-    }
+    const result = await aggregateTweetsWithPagination(matchCondition, page, limit, userId, true)
+    return result
   }
   async updateTweetViews(tweetIds: ObjectId[], userId?: string) {
     const updateView = userId ? { user_views: 1 } : { guest_views: 1 }

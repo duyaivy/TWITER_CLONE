@@ -43,6 +43,19 @@ class DBService {
       console.log('Error creating user indexes:', error)
     }
   }
+  async indexTweets() {
+    try {
+      const existIndex = await this.tweets.indexExists(['content_text'])
+      if (existIndex) {
+        console.log('Tweet indexes already exist')
+      } else {
+        await Promise.all([this.tweets.createIndex({ content: 'text' }, { default_language: 'none' })])
+        console.log('Tweet indexes created successfully')
+      }
+    } catch (error) {
+      console.log('Error creating tweet indexes:', error)
+    }
+  }
   async indexRefreshTokens() {
     try {
       const existIndex = await this.refreshTokens.indexExists(['token_1', 'exp_1'])

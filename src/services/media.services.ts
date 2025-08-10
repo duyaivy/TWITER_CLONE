@@ -1,13 +1,11 @@
 import { Request } from 'express'
 import sharp from 'sharp'
 import ENV, { isDevelopment } from '~/constants/config'
-import { MediaStatus, MediaType } from '~/constants/enum'
+import { MediaType } from '~/constants/enum'
 import { PATH_UPLOAD_IMAGE } from '~/constants/URL'
 import Media from '~/models/schemas/File.schema'
 import { getNameFromFullname, uploadImage, uploadVideo } from '~/utils/file'
 import { queueEncodeHLS } from '~/models/schemas/Queue.schema'
-import videoStatusService from './videoStatus.services'
-import { ObjectId } from 'mongodb'
 
 class MediaService {
   async uploadImage(req: Request) {
