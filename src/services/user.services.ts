@@ -10,7 +10,7 @@ import { omit } from 'lodash'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import { POST_MESSAGES } from '~/constants/messages'
 import { TokenPayload } from '~/type'
-import { sendForgotPasswordNodemailer, sendRegisterEmailNodemailer } from '~/utils/email'
+import { sendForgotPasswordEmail, sendVerifyRegisterEmail } from '~/utils/email'
 import ENV from '~/constants/config'
 import Follower from '~/models/schemas/Follower.schema'
 import { ErrorWithStatus } from '~/models/Errors'
@@ -170,7 +170,8 @@ class UserService {
       email_verify_token: emailToken as string
     })
     // send email
-    await sendRegisterEmailNodemailer(user.email, emailToken as string)
+    await sendVerifyRegisterEmail(user.email, emailToken as string)
+    // await sendRegisterEmailNodemailer(user.email, emailToken as string)
     // save user to database
     const result = await databaseService.users.insertOne(user)
     const userId = result.insertedId.toString()
@@ -264,7 +265,7 @@ class UserService {
     })
 
     // send email
-    await sendRegisterEmailNodemailer(email, emailToken as string)
+    await sendVerifyRegisterEmail(user.email, emailToken as string)
     // cap nhat token
     await databaseService.users.updateOne(
       { _id: user?._id },
@@ -283,7 +284,7 @@ class UserService {
     })
 
     // send email
-    await sendForgotPasswordNodemailer(email, forgotPasswordToken as string)
+    await sendForgotPasswordEmail(email, forgotPasswordToken as string)
     // cap nhat token
     await databaseService.users.updateOne(
       { _id: user?._id },

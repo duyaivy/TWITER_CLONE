@@ -9,7 +9,7 @@ import mediasRouter from './routes/medias.routes'
 import tweetsRouter from './routes/tweets.routes'
 import bookmarkRouter from './routes/bookmarks.routes'
 import searchRouter from './routes/searchs.routes'
-
+import '~/utils/s3'
 const app = express()
 const port = ENV.SERVER_PORT
 
