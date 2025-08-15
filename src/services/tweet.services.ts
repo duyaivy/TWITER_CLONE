@@ -1,4 +1,4 @@
-import Tweet, { TweetsWithTotal } from '~/models/schemas/Tweet.schema'
+import Tweet from '~/models/schemas/Tweet.schema'
 import { TweetRequest } from '~/models/requests/Tweet.request'
 import databaseService from './database.services'
 import Hashtag from '~/models/schemas/Hashtag.schema'
@@ -6,18 +6,13 @@ import { ObjectId } from 'mongodb'
 import BookmarkOrLike from '~/models/schemas/Bookmark.schema'
 import { TweetType } from '~/constants/enum'
 import {
-  addSimulatedViews,
   aggregateTweetsWithPagination,
   joinBookmarksAndLikes,
   joinChildTweets,
   joinHashtags,
   joinMentions,
-  joinUsers,
-  pagination,
-  sortByCreatedAtDesc,
-  sortTwitterCircle
+  joinUsers
 } from '~/utils/aggregation'
-import { r } from 'node_modules/@faker-js/faker/dist/airline-CLphikKp.cjs'
 
 class TweetService {
   async checkAndCreateHashtag(hashtags: string[]) {
