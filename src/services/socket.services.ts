@@ -50,15 +50,11 @@ export const initSocket = (httpServer: any, port: string) => {
       }
       console.log(`User connected: ${user_id}`)
       // middleware tren moi lan goi den socket
-      // socket.use((packet, next) => {
-      //   console.log(packet)
-      //   next()
-      // })
-      // socket.on('error', (err) => {
-      //   if (err && err.message === POST_MESSAGES.UNAUTHORIZED) {
-      //     socket.disconnect()
-      //   }
-      // })
+      socket.use((packet, next) => {
+        console.log('packet', packet)
+        next()
+      })
+
       socket.on('private chat', async (data) => {
         const { receiver_id, message, sender_id, updated_at, created_at } = data
         const receiver = users[receiver_id]
@@ -75,7 +71,11 @@ export const initSocket = (httpServer: any, port: string) => {
           socket.to(receiver.socket_id).emit('receive chat', conversation)
         }
       })
-
+      socket.on('error', (err) => {
+        if (err && err.message === POST_MESSAGES.UNAUTHORIZED) {
+          socket.disconnect()
+        }
+      })
       socket.on('disconnect', () => {
         console.log('user disconnected')
         delete users[user_id]
