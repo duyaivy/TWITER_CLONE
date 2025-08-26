@@ -7,6 +7,8 @@ import VideoStatus from '~/models/schemas/VideoStatus.schema'
 import Tweet from '~/models/schemas/Tweet.schema'
 import Hashtag from '~/models/schemas/Hashtag.schema'
 import BookmarkOrLike from '~/models/schemas/Bookmark.schema'
+import Conservation from '~/models/schemas/Conservations.schema'
+import Conversations from '~/models/schemas/Conservations.schema'
 
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@duyedu.23c9stb.mongodb.net/?retryWrites=true&w=majority&appName=duyEdu`
 
@@ -108,6 +110,9 @@ class DBService {
   }
   get likes(): Collection<BookmarkOrLike> {
     return this.db.collection(ENV.DB_LIKE_COLLECTION)
+  }
+  get conversations(): Collection<Conversations> {
+    return this.db.collection(ENV.DB_CONVERSATION_COLLECTION)
   }
 }
 

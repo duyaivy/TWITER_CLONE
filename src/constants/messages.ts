@@ -28,7 +28,9 @@ export enum USER_MESSAGES {
   UPDATE_ME_SUCCESS = 'Update user information success',
   INCORRECT_PASSWORD = 'Incorrect password',
   INVALID_USERNAME = 'Username must start with a letter and can only contain letters, numbers, and underscores, and must be between 4 and 50 characters',
-  USERNAME_ALREADY_EXISTS = 'Username already exists'
+  USERNAME_ALREADY_EXISTS = 'Username already exists',
+  CONVERSATION_NOT_FOUND = 'Conversation not found',
+  INVALID_DATE = 'Invalid date'
 }
 
 export enum POST_MESSAGES {
@@ -106,4 +108,7 @@ export enum TWEET_MESSAGES {
 }
 export enum SEARCH_MESSAGE {
   SEARCH_SUCCESS = 'Search success'
+}
+export enum CONVERSATION_MESSAGE {
+  GET_CONVERSATION_SUCCESS = 'Get conversation success'
 }

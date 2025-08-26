@@ -13,6 +13,7 @@ const ENV = {
   DB_HASHTAG_COLLECTION: (process.env.DB_HASHTAG_COLLECTION as string) || 'hashtags',
   DB_BOOKMARK_COLLECTION: (process.env.DB_BOOKMARK_COLLECTION as string) || 'bookmarks',
   DB_LIKE_COLLECTION: (process.env.DB_LIKE_COLLECTION as string) || 'likes',
+  DB_CONVERSATION_COLLECTION: (process.env.DB_CONVERSATION_COLLECTION as string) || 'conversations',
   DB_HOST: (process.env.DB_HOST as string) || 'localhost',
   PRIVATE_PASSWORD: (process.env.PRIVATE_PASSWORD as string) || '!@#1234',
   JWT_PRIVATE_KEY: (process.env.JWT_PRIVATE_KEY as string) || '!@#1234ccc',
@@ -54,5 +55,6 @@ export const CONFIG = {
 export const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime']
 export const DEFAULT_VALUE = {
   LIMIT: 20,
-  PAGE: 1
+  PAGE: 1,
+  DATE: new Date()
 }
