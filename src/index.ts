@@ -12,6 +12,13 @@ import searchRouter from './routes/searchs.routes'
 import { createServer } from 'http'
 import conversationRouter from './routes/conversations.route'
 import { initSocket } from './services/socket.services'
+import authRouter from './routes/auths.routes'
+import swaggerUi from 'swagger-ui-express'
+import fs from 'fs'
+import YAML from 'yaml'
+
+const file = fs.readFileSync('./swagger.yaml', 'utf8')
+const swaggerDocument = YAML.parse(file)
 
 const app = express()
 const port = ENV.SERVER_PORT
@@ -38,7 +45,8 @@ app.use('/tweets', tweetsRouter)
 app.use('/bookmarks', bookmarkRouter)
 app.use('/searchs', searchRouter)
 app.use('/conversations', conversationRouter)
-
+app.use('/auth', authRouter)
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 // handle errors globally
 app.use(defaultErrorHandler)
 // web socket

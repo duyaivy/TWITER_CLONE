@@ -1,0 +1,1135 @@
+openapi: 3.0.3
+info:
+  title: Twitter_clone
+  version: 1.0.0
+servers:
+  - url: http://localhost:4000
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: quocduy0322@gmail.com
+        password:
+          type: string
+          example: a11111111!
+      required:
+        - email
+        - password
+    RegisterRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: quocduy0322@gmail.com
+        password:
+          type: string
+          example: a11111111!
+        date_of_birth:
+          type: string
+          format: date-time
+          example: '1910-07-12T16:12:51.364Z'
+        confirm_password:
+          type: string
+          example: a11111111!
+        name:
+          type: string
+          example: Quoc Duy
+      required:
+        - email
+        - password
+        - confirm_password
+        - name
+    ForgotPasswordRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: quocduy0322@gmail.com
+      required:
+        - email
+    ResetPasswordRequest:
+      type: object
+      properties:
+        password:
+          type: string
+          example: a11111111!
+        confirm_password:
+          type: string
+          example: a11111111!
+        forgot_password_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+      required:
+        - password
+        - confirm_password
+        - forgot_password_token
+    UpdateMeRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Duy Dep trai
+        date_of_birth:
+          type: string
+          format: date-time
+          example: '1990-07-12T16:12:51.364Z'
+        location:
+          type: string
+          example: Da Nang
+        website:
+          type: string
+          example: duyaivy.com
+        username:
+          type: string
+          example: quocduy0322
+        avatar:
+          type: string
+          example: https://example.com/avatar.jpg
+    ChangePasswordRequest:
+      type: object
+      properties:
+        old_password:
+          type: string
+          example: aq11111111!
+        password:
+          type: string
+          example: aqq111111!
+        confirm_password:
+          type: string
+          example: aqq111111!
+      required:
+        - old_password
+        - password
+        - confirm_password
+    FollowRequest:
+      type: object
+      properties:
+        followed_user_id:
+          type: string
+          example: 688d7b33efb608550ed665ac
+      required:
+        - followed_user_id
+    CreateTweetRequest:
+      type: object
+      properties:
+        content:
+          type: string
+          example: Test create tweet
+        parent_id:
+          nullable: true
+          type: string
+          example: null
+        mentions:
+          type: array
+          items:
+            type: string
+          example:
+            - 6873d895b8e5cdbb7df722a7
+            - 6873d895b8e5cdbb7df726b2
+        type:
+          type: integer
+          example: 0
+        audience:
+          type: integer
+          example: 0
+        hashtags:
+          type: array
+          items:
+            type: string
+          example:
+            - nodejs
+            - express
+        medias:
+          type: array
+          items:
+            type: object
+          example: [{ url: https://example.com/image.jpg, type: 1 }]
+          description: Array of media objects with url and type (1 for image, 2 for video, 3 for HLS video)
+      required:
+        - content
+        - type
+        - audience
+    BookmarkRequest:
+      type: object
+      properties:
+        tweet_id:
+          type: string
+          example: 6889df15f2f95a47f40ac16c
+      required:
+        - tweet_id
+    SearchQuery:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 2
+        content:
+          type: string
+          example: nodejs
+    SearchHashtagsQuery:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 2
+        hashtag:
+          type: string
+          example: cak,he
+      required:
+        - hashtag
+    UploadImageRequest:
+      type: object
+      properties:
+        image:
+          type: string
+          format: binary
+      required:
+        - image
+    UploadVideoRequest:
+      type: object
+      properties:
+        video:
+          type: string
+          format: binary
+      required:
+        - video
+    TweetResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Create new tweet successfully
+        data:
+          type: object
+          properties:
+            _id:
+              type: string
+              example: '60c72b2f9b1e8e001c8f8e4f'
+            user_id:
+              type: string
+              example: '60c72b2f9b1e8e001c8f8e4f'
+            content:
+              type: string
+              example: 'This is a new tweet'
+            parent_id:
+              type: string
+              example: '60c72b2f9b1e8e001c8f8e4f'
+            created_at:
+              type: string
+              format: date-time
+              example: '2023-03-15T12:00:00Z'
+            updated_at:
+              type: string
+              format: date-time
+              example: '2023-03-15T12:00:00Z'
+            mentions:
+              type: array
+              example: ['60c72b2f9b1e8e001c8f8e4f', '60c72b2f9b1e8e001c8f286A']
+            type:
+              type: integer
+              description: |
+                - `0`: Tweet
+                - `1`: Retweet
+                - `2`: Comment
+                - `3`: Quotetweet
+              example: 1
+            audience:
+              type: integer
+              description: |
+                - `0`: Everyone
+                - `1`: TwitterCircle
+              example: 1
+            hashtags:
+              type: array
+              items:
+                type: string
+              example: ['nodejs', 'express']
+            medias:
+              type: array
+              items:
+                type: object
+              example:
+                [{ type: 1, url: 'https://example.com/video.mp4' }, { type: 0, url: 'https://example.com/image.jpg' }]
+            guest_views:
+              type: integer
+              example: 100
+            user_views:
+              type: integer
+              example: 50
+  examples:
+    TweetCreatedExample:
+      summary: A created tweet response
+      value:
+        _id: '60c72b2f9b1e8e001c8f8e4f'
+        user_id: '60c72b2f9b1e8e001c8f8e4f'
+        content: 'This is a new tweet'
+        parent_id: '60c72b2f9b1e8e001c8f8e4f'
+        created_at: '2023-03-15T12:00:00Z'
+        updated_at: '2023-03-15T12:00:00Z'
+        mentions: ['60c72b2f9b1e8e001c8f8e4f', '60c72b2f9b1e8e001c8f286A']
+        type: 1
+        audience: 1
+        hashtags: ['nodejs', 'express']
+        medias:
+          - type: 1
+            url: 'https://example.com/video.mp4'
+          - type: 0
+            url: 'https://example.com/image.jpg'
+        guest_views: 100
+        user_views: 50
+    PaginationExample:
+      summary: Example of empty pagination response
+      value:
+        message: Get new feeds success
+        data:
+          control:
+            total: 0
+            page: 1
+            limit: 20
+          data: []
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+paths:
+  /auth/login:
+    post:
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Request successfully
+      tags:
+        - Auth
+  /users/register:
+    post:
+      summary: Register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Request successfully
+      tags:
+        - Auth
+  /auth/logout:
+    post:
+      summary: Logout
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                {
+                  refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODg0NTU4ZThiMzVkZjA5NGUxYzg0NDAiLCJ0b2tlbl90eXBlIjoxLCJ2ZXJpZnkiOjEsImlhdCI6MTc1NjE3NDk4NywiZXhwIjoxNzU4NzY2OTg3fQ.VoiRfobOmXidGfdEaHthKzQVc4ETsBPa2PUnBwcBrOU
+                }
+      responses:
+        '200':
+          description: OK
+
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logout successful
+      tags:
+        - Auth
+  /auth/refresh-token:
+    post:
+      summary: Refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                {
+                  refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODg0NTU4ZThiMzVkZjA5NGUxYzg0NDAiLCJ0b2tlbl90eXBlIjoxLCJ2ZXJpZnkiOjEsImlhdCI6MTc1NjE3NDk4NywiZXhwIjoxNzU4NzY2OTg3fQ.VoiRfobOmXidGfdEaHthKzQVc4ETsBPa2PUnBwcBrOU
+                }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Request successfully
+      tags:
+        - Auth
+  /auth/email-verify:
+    post:
+      summary: Verify email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              example: { email_verify_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Email verified successfull
+      tags:
+        - Auth
+  /auth/resend-verify-email:
+    post:
+      summary: Resend verify email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: quocduy0322@gmail.com
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Resend email verified successfully
+      tags:
+        - Auth
+  /users/forgot-password:
+    post:
+      summary: Forgot password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forgot password email sent successfully
+      tags:
+        - Users
+  /users/reset-password:
+    post:
+      summary: Reset password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Reset password successfully
+      tags:
+        - Users
+  /users/me:
+    get:
+      summary: Get profile of current user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: 60c72b2f9b1e8e001c8f8e4f
+                  email:
+                    type: string
+                    example: quocduy0322@gmail.com
+                  name:
+                    type: string
+                    example: Quoc Duy
+                    description: Name of the user
+                  bio:
+                    type: string
+                    example: Software Engineer
+                    description: Bio of the user
+                  location:
+                    type: string
+                    example: Da Nang, Vietnam
+                    description: Location of the user
+                  website:
+                    type: string
+                    example: https://quocduy0322.github.io
+                    description: Website of the user
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: 2022-01-01T00:00:00Z
+                    description: Account creation date
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    example: 2022-01-01T00:00:00Z
+                    description: Account update date
+                  avatar:
+                    type: string
+                    example: https://example.com/avatar.jpg
+                    description: Avatar URL of the user
+                  cover_photo:
+                    type: string
+                    example: https://example.com/cover.jpg
+                    description: Cover photo URL of the user
+                  twitter_circle:
+                    type: array
+                    items:
+                      type: string
+                    example: ['60c72b2f9b1e8e001c8f8e4f', '60c72b2f9b1e8e001c8f286A', '60c72b2f9b1e8e001c8f8238a']
+
+      tags:
+        - Users
+    patch:
+      summary: Update current user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMeRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: 60c72b2f9b1e8e001c8f8e4f
+                  email:
+                    type: string
+                    example: quocduy0322@gmail.com
+                  name:
+                    type: string
+                    example: Quoc Duy
+                    description: Name of the user
+                  bio:
+                    type: string
+                    example: Software Engineer
+                    description: Bio of the user
+                  location:
+                    type: string
+                    example: Da Nang, Vietnam
+                    description: Location of the user
+                  website:
+                    type: string
+                    example: https://quocduy0322.github.io
+                    description: Website of the user
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: 2022-01-01T00:00:00Z
+                    description: Account creation date
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    example: 2022-01-01T00:00:00Z
+                    description: Account update date
+                  avatar:
+                    type: string
+                    example: https://example.com/avatar.jpg
+                    description: Avatar URL of the user
+                  cover_photo:
+                    type: string
+                    example: https://example.com/cover.jpg
+                    description: Cover photo URL of the user
+                  twitter_circle:
+                    type: array
+                    items:
+                      type: string
+                    example: ['60c72b2f9b1e8e001c8f8e4f', '60c72b2f9b1e8e001c8f286A', '60c72b2f9b1e8e001c8f8238a']
+
+      tags:
+        - Users
+  /users/change-password:
+    put:
+      summary: Change password
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Request successfully
+      tags:
+        - Users
+  /users/follower:
+    post:
+      summary: Follow user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FollowRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Follow user successfully
+      tags:
+        - Users
+  /users/unFollower:
+    post:
+      summary: Unfollow user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FollowRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unfollow user successfully
+      tags:
+        - Users
+  /medias/upload-image:
+    post:
+      summary: Upload image
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadImageRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Upload image successfully
+      tags:
+        - Medias
+  /medias/upload-video:
+    post:
+      summary: Upload video
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadVideoRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Upload video successfully
+      tags:
+        - Medias
+  /medias/upload-video-hls:
+    post:
+      summary: Upload HLS video
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadVideoRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Upload HLS video successfully
+      tags:
+        - Medias
+  /medias/videos-hls/{id}:
+    get:
+      summary: Get HLS video
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: '60c72b2f9b1e8e01c8f8238a'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Get video HLS successfully
+
+      tags:
+        - Medias
+  /medias/videos-hls/status/{id}:
+    get:
+      summary: Check HLS status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: '60c72b2f9b1e8e001c8f8e4f'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Get video HLS status successfully
+                  status:
+                    type: integer
+                    enum: [0, 1, 2]
+                    description: |
+                      - `0`: Not completed (processing)
+                      - `1`: Completed successfully
+                      - `2`: Failed
+                    example: 1
+      tags:
+        - Medias
+  /tweets:
+    post:
+      summary: Create tweet
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTweetRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TweetResponse'
+              examples:
+                success:
+                  $ref: '#/components/examples/TweetCreatedExample'
+      tags:
+        - Tweets
+    get:
+      summary: Get new feeds
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            example: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            example: 20
+        - name: type
+          in: query
+          schema:
+            type: integer
+            description: |
+              - `0`: Tweets
+              - `1`: Retweets
+              - `2`: Comment
+              - `3`: QuoteTweet
+            example: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TweetResponse'
+              examples:
+                success:
+                  $ref: '#/components/examples/PaginationExample'
+      tags:
+        - Tweets
+  /tweets/{tweet_id}/childrens:
+    get:
+      summary: Get children tweets
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tweet_id
+          required: true
+          in: path
+          schema:
+            type: string
+            example: 6889df15f2f95a47f40ac16c
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Get tweet detail successfully
+                  data:
+                    type: object
+                    example:
+                      $ref: '#/components/examples/TweetCreatedExample/value'
+      tags:
+        - Tweets
+  /tweets/{tweet_id}/likes:
+    post:
+      summary: Like tweet
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tweet_id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: 6889df15f2f95a47f40ac16c
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Like tweet successfully
+      tags:
+        - Tweets
+    delete:
+      summary: Unlike tweet
+      parameters:
+        - name: tweet_id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: 6889df15f2f95a47f40ac16c
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unlike tweet successfully
+      tags:
+        - Tweets
+  /bookmarks:
+    post:
+      summary: Bookmark
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookmarkRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Bookmark successfully
+      tags:
+        - Bookmark
+    delete:
+      summary: Unbookmark
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookmarkRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: UnBookmark successfully
+      tags:
+        - Bookmark
+  /searchs:
+    get:
+      summary: Search tweets
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            example: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            example: 20
+        - name: content
+          in: query
+          schema:
+            type: string
+            example: nodejs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Request successfully
+                  data:
+                    type: array
+
+                example:
+                  message: Get search tweets successfully
+                  data: { control: { page: 1, limit: 20, total: 1 }, data: [] }
+      tags:
+        - Search
+  /searchs/hashtags:
+    get:
+      summary: Search by hashtags
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            example: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            example: 2
+        - name: hashtag
+          in: query
+          required: true
+          schema:
+            type: string
+            example: cak,he
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Request successfully
+                  data:
+                    type: array
+
+                example:
+                  message: Get search tweets successfully
+                  data: { control: { page: 1, limit: 20, total: 1 }, data: [] }
+      tags:
+        - Search
+  /conversations/receivers/{id}:
+    get:
+      summary: Get conversation by receiver id
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: '12345'
+        - name: last_updated_at
+          in: query
+          schema:
+            type: string
+            format: date-time
+            example: '2025-08-14T13:45:08.272Z'
+        - name: last_message_id
+          in: query
+          schema:
+            type: string
+            example: 689de86492a7840f3b585a56
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            example: 10
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Get conversation successfully
+                  data:
+                    type: object
+                    example: { control: { page: 1, limit: 10, total: 1 }, data: [] }
+      tags:
+        - Conversations
