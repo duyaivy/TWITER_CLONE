@@ -1,28 +1,29 @@
+// ecosystem.config.js
+const path = require('path')
+const LOG_DIR = path.join(process.env.HOME || __dirname, 'logs', 'twitter_clone')
+
 module.exports = {
   apps: [
     {
       name: 'twitter_clone',
       cwd: __dirname,
       script: 'dist/index.js',
+      args: '--production',
       instances: 'max',
       exec_mode: 'cluster',
       autorestart: true,
       max_memory_restart: '512M',
       time: true,
-
       watch: false,
 
-      error_file: '/var/log/twitter_clone/error.log',
-      out_file: '/var/log/twitter_clone/out.log',
+      // Log vào HOME thay vì /var/log
+      error_file: path.join(LOG_DIR, 'error.log'),
+      out_file: path.join(LOG_DIR, 'out.log'),
       merge_logs: true,
 
-      // Env cho 2 môi trường (nếu cần override)
-      env: {
-        NODE_ENV: 'development'
-      },
-      env_production: {
-        NODE_ENV: 'production'
-      }
+      // ENV (có thể gộp luôn NODE_ENV=production)
+      env: { NODE_ENV: 'production' },
+      env_production: { NODE_ENV: 'production' }
     }
   ]
 }
