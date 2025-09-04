@@ -1,5 +1,5 @@
 import { MediaQueryType } from '~/constants/enum'
-import { PaginationQuery } from './Others.request'
+import { PaginationQuery } from './others.request'
 
 export interface SearchQuery extends PaginationQuery {
   content: string

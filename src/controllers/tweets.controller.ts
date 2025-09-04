@@ -52,8 +52,8 @@ export const unlikeTweetController = async (req: Request<TweetParams>, res: Resp
 }
 export const getTweetChildrenController = async (req: Request<TweetParams, any, any, TweetQuery>, res: Response) => {
   const type = (Number(req.query.type) as TweetType) || undefined
-  const limit = Number(req.query.limit) || DEFAULT_VALUE.LIMIT // default limit
-  const page = Number(req.query.page) || DEFAULT_VALUE.PAGE // default page
+  const limit = Number(req.query.limit) || DEFAULT_VALUE.LIMIT
+  const page = Number(req.query.page) || DEFAULT_VALUE.PAGE
   const tweetId = req.params.tweet_id
   const { userId } = (req.decode_access_token as TokenPayload) || {}
 
